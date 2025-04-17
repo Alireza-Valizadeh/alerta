@@ -23,4 +23,7 @@ export class User {
 
   @Column()
   phone: string;
+
+  @Column()
+  password: string;
 }
