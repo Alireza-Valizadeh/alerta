@@ -1,9 +1,10 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { userConstants } from './constants';
+import { UserMessages } from './enums/user-messages.enum';
 @Injectable()
 export class UsersService {
   constructor(
@@ -23,11 +24,19 @@ export class UsersService {
   update(id: number, user: Partial<User>): Promise<UpdateResult> {
     return this.usersRepository.update(id, user);
   }
-  findOneById(id: number): Promise<User> {
-    return this.usersRepository.findOneBy({ id });
+  async findOneById(id: number): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ id });
+    if (!user) {
+      throw new NotFoundException(UserMessages.NotFound);
+    }
+    return user;
   }
-  findOneByEmail(email: string): Promise<User> {
-    return this.usersRepository.findOneBy({ email });
+  async findOneByEmail(email: string): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ email });
+    if (!user) {
+      throw new NotFoundException(UserMessages.NotFound);
+    }
+    return user;
   }
   async delete(id: number): Promise<void> {
     await this.usersRepository.delete(id);
