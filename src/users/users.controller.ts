@@ -16,6 +16,13 @@ import { AuthGuard } from 'src/auth/auth.guard';
 @Controller('users')
 export class UsersController {
   constructor(private usersService: UsersService) {}
+  // protected routes
+  @Get('profile')
+  @UseGuards(AuthGuard)
+  getUserProfile(@Request() request) {
+    return this.usersService.findOneById(request.user.sub);
+  }
+
   @Get(':id')
   getUserById(@Param('id') id: number) {
     return this.usersService.findOneById(id);
@@ -35,15 +42,5 @@ export class UsersController {
   @Delete(':id')
   deleteUser(@Param('id') id: number) {
     return this.usersService.delete(id);
-  }
-  // protected routes
-  // TODO - does not work
-  @Get('profile')
-  @UseGuards(AuthGuard)
-  getUserProfile(@Request() req) {
-    console.log({ req });
-    const id = req.user.sub;
-    console.log({ id });
-    return this.usersService.findOneById(id);
   }
 }
