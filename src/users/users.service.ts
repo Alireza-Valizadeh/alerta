@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  ConflictException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository, UpdateResult } from 'typeorm';
@@ -12,6 +16,12 @@ export class UsersService {
     private usersRepository: Repository<User>,
   ) {}
   async register(user: Omit<User, 'id'>): Promise<Omit<User, 'password'>> {
+    const existingUser = await this.usersRepository.findOneBy({
+      email: user.email,
+    });
+    if (existingUser) {
+      throw new ConflictException(UserMessages.Duplicate);
+    }
     const hashedPassword = await bcrypt.hash(
       user.password,
       userConstants.saltRounds,

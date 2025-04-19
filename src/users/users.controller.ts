@@ -4,14 +4,18 @@ import {
   Delete,
   Get,
   Param,
+  ParseIntPipe,
   Post,
   Put,
   Request,
   UseGuards,
+  UsePipes,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { AuthGuard } from 'src/auth/auth.guard';
+import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
+import { registerUserSchema } from './dto/register-user.dto';
 
 @Controller('users')
 export class UsersController {
@@ -24,7 +28,7 @@ export class UsersController {
   }
 
   @Get(':id')
-  getUserById(@Param('id') id: number) {
+  getUserById(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findOneById(id);
   }
   @Get('/email/:email')
@@ -32,6 +36,7 @@ export class UsersController {
     return this.usersService.findOneByEmail(email);
   }
   @Post('register')
+  @UsePipes(new ZodValidationPipe(registerUserSchema))
   createUser(@Body() user: Omit<User, 'id'>) {
     return this.usersService.register(user);
   }
