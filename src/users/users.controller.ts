@@ -10,6 +10,7 @@ import {
   Request,
   UseGuards,
   UsePipes,
+  Version,
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
@@ -17,7 +18,9 @@ import { AuthGuard } from 'src/auth/auth.guard';
 import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
 import { registerUserSchema } from './dto/register-user.dto';
 
-@Controller('users')
+@Controller({
+  path: 'users',
+})
 export class UsersController {
   constructor(private usersService: UsersService) {}
   // protected routes
@@ -46,6 +49,13 @@ export class UsersController {
   }
   @Delete(':id')
   deleteUser(@Param('id') id: number) {
+    return this.usersService.delete(id);
+  }
+
+  @Delete(':id')
+  @Version('2')
+  deleteUserV2(@Param('id') id: number) {
+    console.log('This is V2');
     return this.usersService.delete(id);
   }
 }
