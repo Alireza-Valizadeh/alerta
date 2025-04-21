@@ -1,0 +1,5 @@
+{
+  "watch": ["src"],
+  "ignore": ["node_modules", "dist"],
+  "exec": "ts-node --transpileOnly src/main.ts"
+}
