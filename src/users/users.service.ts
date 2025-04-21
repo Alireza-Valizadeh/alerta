@@ -9,7 +9,7 @@ import { Repository, UpdateResult } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { userConstants } from './constants';
 import { UserMessages } from './enums/user-messages.enum';
-import { MyLoggerService } from 'src/logger/logger.service';
+import { MyLoggerService } from '../logger/logger.service';
 @Injectable()
 export class UsersService {
   constructor(

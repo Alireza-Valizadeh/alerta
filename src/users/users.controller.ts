@@ -14,8 +14,8 @@ import {
 } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { User } from './user.entity';
-import { AuthGuard } from 'src/auth/auth.guard';
-import { ZodValidationPipe } from 'src/pipes/zod-validation.pipe';
+import { AuthGuard } from '../auth/auth.guard';
+import { ZodValidationPipe } from '../pipes/zod-validation.pipe';
 import { registerUserSchema } from './dto/register-user.dto';
 
 @Controller({

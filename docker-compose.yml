@@ -1,0 +1,32 @@
+services:
+  db:
+    image: postgres:14-alpine # Use a specific version for stability
+    container_name: postgres_db
+    restart: always
+    ports:
+      - '5432:5432'
+    environment:
+      POSTGRES_USER: root
+      POSTGRES_PASSWORD: 139142625
+      POSTGRES_DB: shekarchi
+    volumes:
+      - db_data:/var/lib/postgresql/data # Persist data even if the container restarts
+  app:
+    build: . # Build from the current directory (where Dockerfile is)
+    container_name: shekarchi
+    restart: always
+    ports:
+      - '3000:3000'
+    environment:
+      DB_HOST: db # Use the service name as the host
+      DB_PORT: 5432
+      DB_USER: root
+      DB_PASSWORD: 139142625
+      DB_NAME: shekarchi
+    volumes:
+        - ./src:/usr/src/app/src
+    depends_on:
+      - db # Ensure the database starts before the app
+    command: npm run start:dev
+volumes:
+  db_data:

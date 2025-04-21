@@ -24,7 +24,9 @@ export class MyLoggerService implements LoggerService {
         filename: path.join('logs', 'debug.log.txt'),
         level: 'debug',
       }),
-      new transports.Console(),
+      new transports.Console({
+        level: 'debug',
+      }),
     ],
   });
 
