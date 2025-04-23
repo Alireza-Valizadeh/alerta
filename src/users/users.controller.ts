@@ -30,6 +30,10 @@ export class UsersController {
     return this.usersService.findOneById(request.user.sub);
   }
 
+  @Get('/all-users')
+  getAllUsers() {
+    return this.usersService.findAll();
+  }
   @Get(':id')
   getUserById(@Param('id', ParseIntPipe) id: number) {
     return this.usersService.findOneById(id);

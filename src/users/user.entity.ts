@@ -1,29 +1,29 @@
-import { Column, Entity, PrimaryGeneratedColumn, Unique } from 'typeorm';
+import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Gender } from './enums/genders.enum';
 
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
   id: number;
 
-  @Column()
+  @Column({ type: 'varchar', length: 50, nullable: true })
   firstName: string;
 
-  @Column()
+  @Column({ type: 'varchar', length: 50, nullable: true })
   lastName: string;
 
-  @Column()
-  @Unique(['email'])
+  @Column({ type: 'varchar', unique: true })
   email: string;
 
-  @Column({ default: 'Not Set' })
-  gender: string;
+  @Column({ type: 'enum', enum: Gender, default: Gender.NOT_SPECIFIED })
+  gender: Gender;
 
-  @Column({ default: false })
+  @Column({ type: 'boolean', default: false })
   isAbandoned: boolean;
 
-  @Column()
+  @Column({ type: 'varchar', nullable: true })
   phone: string;
 
-  @Column()
+  @Column({ type: 'varchar' })
   password: string;
 }
