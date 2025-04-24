@@ -7,6 +7,9 @@ import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { LoggerMiddleware } from './middlewares/logger.middleware';
 import { MyLoggerModule } from './logger/logger.module';
+import { PreferencesModule } from './preferences/preferences.module';
+import { ListingsModule } from './listings/listings.module';
+import { NotificationsModule } from './notifications/notifications.module';
 
 @Module({
   imports: [
@@ -30,6 +33,9 @@ import { MyLoggerModule } from './logger/logger.module';
     }),
     UsersModule,
     AuthModule,
+    PreferencesModule,
+    ListingsModule,
+    NotificationsModule,
   ],
   controllers: [AppController],
   providers: [AppService],

@@ -1,5 +1,6 @@
-import { Column, Entity, PrimaryGeneratedColumn } from 'typeorm';
+import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Gender } from './enums/genders.enum';
+import { Listing } from '../listings/listing.entity';
 
 @Entity({ name: 'Users' })
 export class User {
@@ -26,4 +27,7 @@ export class User {
 
   @Column({ type: 'varchar' })
   password: string;
+
+  @OneToMany(() => Listing, (listing) => listing.user)
+  listings: Listing[];
 }
