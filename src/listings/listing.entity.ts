@@ -1,5 +1,5 @@
-import { Model } from '../common/model.entity';
-import { Make } from '../common/make.entity';
+import { Model } from '../common/entities/model.entity';
+import { Make } from '../common/entities/make.entity';
 import { User } from '../users/user.entity';
 import {
   Column,
@@ -8,14 +8,14 @@ import {
   ManyToOne,
   PrimaryGeneratedColumn,
 } from 'typeorm';
-import { Color } from '../common/color.entity';
-import { State } from '../common/state.entity';
-import { City } from '../common/city.entity';
-import { Gearbox } from '../common/gearbox.entity';
-import { FuelType } from '../common/fuelType.entity';
-import { EngineState } from '../common/engineState.entity';
-import { ChassisState } from '../common/chassisState.entity';
-import { BodyState } from '../common/bodyState.entity';
+import { Color } from '../common/entities/color.entity';
+import { State } from '../common/entities/state.entity';
+import { City } from '../common/entities/city.entity';
+import { Gearbox } from '../common/entities/gearbox.entity';
+import { FuelType } from '../common/entities/fuelType.entity';
+import { EngineState } from '../common/entities/engineState.entity';
+import { ChassisState } from '../common/entities/chassisState.entity';
+import { BodyState } from '../common/entities/bodyState.entity';
 
 @Entity({ name: 'Listings' })
 export class Listing {
@@ -31,55 +31,55 @@ export class Listing {
 
   @ManyToOne(() => Make, (make) => make.listings)
   @JoinColumn({ name: 'makeId' })
-  make: string;
+  make: Make;
 
   @ManyToOne(() => Model, (model) => model.listings)
   @JoinColumn({ name: 'modelId' })
-  model: string;
+  model: Model;
 
   @Column({ type: 'integer' })
   year: number;
 
   @ManyToOne(() => Color, (color) => color.listings)
   @JoinColumn({ name: 'colorId' })
-  color: string;
+  color: Color;
 
   @Column({ type: 'bigint' })
   mileage: number;
 
   @ManyToOne(() => State, (state) => state.listings)
   @JoinColumn({ name: 'stateId' })
-  state: string;
+  state: State;
 
   @ManyToOne(() => City, (city) => city.listings)
   @JoinColumn({ name: 'cityId' })
-  city: string;
+  city: City;
 
   @Column({ type: 'integer' })
   insuranceDuration: number;
 
   @ManyToOne(() => Gearbox, (gearbox) => gearbox.listings)
   @JoinColumn({ name: 'gearboxId' })
-  gearbox: string;
+  gearbox: Gearbox;
 
   @ManyToOne(() => FuelType, (fuelType) => fuelType.listings)
   @JoinColumn({ name: 'fuelTypeId' })
-  fuelType: string;
+  fuelType: FuelType;
 
   @Column({ type: 'bigint' })
   price: number;
 
   @ManyToOne(() => EngineState, (engineState) => engineState.listings)
   @JoinColumn({ name: 'engineStateId' })
-  engineState: string;
+  engineState: EngineState;
 
   @ManyToOne(() => ChassisState, (chassisState) => chassisState.listings)
   @JoinColumn({ name: 'chassisStateId' })
-  chassisState: string;
+  chassisState: ChassisState;
 
   @ManyToOne(() => BodyState, (bodyState) => bodyState.listings)
   @JoinColumn({ name: 'bodyStateId' })
-  bodyState: string;
+  bodyState: BodyState;
 
   @Column({ type: 'varchar', length: 500, nullable: true })
   description: string | null;

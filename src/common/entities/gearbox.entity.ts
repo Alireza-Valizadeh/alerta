@@ -1,14 +1,14 @@
-import { Listing } from '../listings/listing.entity';
+import { Listing } from '../../listings/listing.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 
-@Entity({ name: 'Makes' })
-export class Make {
+@Entity({ name: 'Gearboxes' })
+export class Gearbox {
   @PrimaryGeneratedColumn()
   id: number;
 
   @Column({ type: 'varchar', length: 50, unique: true })
   title: string;
 
-  @OneToMany(() => Listing, (listing) => listing.make)
+  @OneToMany(() => Listing, (listing) => listing.gearbox)
   listings: Listing[];
 }

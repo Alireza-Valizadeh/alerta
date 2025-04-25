@@ -1,15 +1,17 @@
 import { Module } from '@nestjs/common';
 import { TypeOrmModule } from '@nestjs/typeorm';
-import { Make } from './make.entity';
-import { Model } from './model.entity';
-import { Color } from './color.entity';
-import { State } from './state.entity';
-import { City } from './city.entity';
-import { Gearbox } from './gearbox.entity';
-import { FuelType } from './fuelType.entity';
-import { EngineState } from './engineState.entity';
-import { ChassisState } from './chassisState.entity';
-import { BodyState } from './bodyState.entity';
+import { Make } from './entities/make.entity';
+import { Model } from './entities/model.entity';
+import { Color } from './entities/color.entity';
+import { State } from './entities/state.entity';
+import { City } from './entities/city.entity';
+import { Gearbox } from './entities/gearbox.entity';
+import { FuelType } from './entities/fuelType.entity';
+import { EngineState } from './entities/engineState.entity';
+import { ChassisState } from './entities/chassisState.entity';
+import { BodyState } from './entities/bodyState.entity';
+import { GearboxesService } from './gearboxes/gearboxes.service';
+import { GearboxesController } from './gearboxes/gearboxes.controller';
 
 @Module({
   imports: [
@@ -26,5 +28,8 @@ import { BodyState } from './bodyState.entity';
       BodyState,
     ]),
   ],
+  providers: [GearboxesService],
+  controllers: [GearboxesController],
+  exports: [TypeOrmModule, GearboxesService],
 })
 export class CommonModule {}
