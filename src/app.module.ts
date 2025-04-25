@@ -10,6 +10,7 @@ import { MyLoggerModule } from './logger/logger.module';
 import { PreferencesModule } from './preferences/preferences.module';
 import { ListingsModule } from './listings/listings.module';
 import { NotificationsModule } from './notifications/notifications.module';
+import { CommonModule } from './common/common.module';
 
 @Module({
   imports: [
@@ -28,6 +29,7 @@ import { NotificationsModule } from './notifications/notifications.module';
         database: configService.get('DB_DATABASE'),
         autoLoadEntities: true,
         synchronize: true,
+        logging: false,
       }),
       inject: [ConfigService],
     }),
@@ -36,6 +38,7 @@ import { NotificationsModule } from './notifications/notifications.module';
     PreferencesModule,
     ListingsModule,
     NotificationsModule,
+    CommonModule,
   ],
   controllers: [AppController],
   providers: [AppService],
