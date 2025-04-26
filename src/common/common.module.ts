@@ -12,6 +12,8 @@ import { ChassisState } from './entities/chassisState.entity';
 import { BodyState } from './entities/bodyState.entity';
 import { GearboxesService } from './gearboxes/gearboxes.service';
 import { GearboxesController } from './gearboxes/gearboxes.controller';
+import { BodyStatesService } from './body-states/body-states.service';
+import { BodyStatesController } from './body-states/body-states.controller';
 
 @Module({
   imports: [
@@ -28,8 +30,8 @@ import { GearboxesController } from './gearboxes/gearboxes.controller';
       BodyState,
     ]),
   ],
-  providers: [GearboxesService],
-  controllers: [GearboxesController],
+  providers: [GearboxesService, BodyStatesService],
+  controllers: [GearboxesController, BodyStatesController],
   exports: [TypeOrmModule, GearboxesService],
 })
 export class CommonModule {}

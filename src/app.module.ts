@@ -11,6 +11,7 @@ import { PreferencesModule } from './preferences/preferences.module';
 import { ListingsModule } from './listings/listings.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { CommonModule } from './common/common.module';
+import { DatabaseModule } from './database/database.module';
 
 @Module({
   imports: [
@@ -39,6 +40,7 @@ import { CommonModule } from './common/common.module';
     ListingsModule,
     NotificationsModule,
     CommonModule,
+    DatabaseModule,
   ],
   controllers: [AppController],
   providers: [AppService],
