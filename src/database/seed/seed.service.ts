@@ -12,6 +12,7 @@ import { Model } from '../../common/entities/model.entity';
 import { State } from '../../common/entities/state.entity';
 import { Repository } from 'typeorm';
 import { MyLoggerService } from '../../logger/logger.service';
+import { PersianTranslations } from '../../common/enums/translations.enum';
 
 @Injectable()
 export class SeedService implements OnModuleInit {
@@ -43,13 +44,12 @@ export class SeedService implements OnModuleInit {
     await this.seedBodyStates();
     await this.seedGearboxes();
     await this.seedColors();
+    await this.seedFuelTypes();
+    await this.seedEngineStates();
+    await this.seedChassisStates();
     // await this.seedModels();
     // await this.seedStates();
     // await this.seedCities();
-    // await this.seedGearboxes();
-    // await this.seedFuelTypes();
-    // await this.seedEngineStates();
-    // await this.seedChassisStates();
   }
 
   async seedBodyStates() {
@@ -98,6 +98,46 @@ export class SeedService implements OnModuleInit {
         { title: 'آبی آسمانی' },
       ];
       await this.colorRepository.save(colorsToSeed);
+    }
+  }
+
+  async seedFuelTypes() {
+    const existingFuelTypes = await this.fuelTypeRepository.count();
+    this.logger.log('Existing Fuel Types', existingFuelTypes);
+    if (existingFuelTypes === 0) {
+      const fuelTypesToSeed = [
+        { title: 'دیزل' },
+        { title: 'بنزینی' },
+        { title: 'برقی' },
+        { title: 'هیبرید' },
+        { title: 'دوگانه دستی' },
+        { title: 'دوگانه کارخانه' },
+      ];
+      await this.fuelTypeRepository.save(fuelTypesToSeed);
+    }
+  }
+
+  async seedEngineStates() {
+    const existingEngineStates = await this.engineStateRepository.count();
+    this.logger.log('Existing Engine States', existingEngineStates);
+    if (existingEngineStates === 0) {
+      const engineStatesToSeed = [
+        { title: 'سالم' },
+        { title: 'نیاز به تعمیر' },
+        { title: 'تعویض شده' },
+      ];
+      await this.engineStateRepository.save(engineStatesToSeed);
+    }
+  }
+
+  async seedChassisStates() {
+    const existingChassisStates = await this.chassisStateRepository.count();
+    this.logger.log('Existing Chassis States', existingChassisStates);
+    if (existingChassisStates === 0) {
+      const chassisStatesToSeed = Object.values(
+        PersianTranslations.ChassisState || {},
+      ).map((value) => ({ title: value }));
+      await this.chassisStateRepository.save(chassisStatesToSeed);
     }
   }
 }
