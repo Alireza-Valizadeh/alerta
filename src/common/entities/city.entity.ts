@@ -1,5 +1,12 @@
 import { Listing } from '../../listings/listing.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { State } from './state.entity';
 
 @Entity({ name: 'Cities' })
 export class City {
@@ -8,6 +15,9 @@ export class City {
 
   @Column({ type: 'varchar', length: 100, unique: true })
   title: string;
+
+  @ManyToOne(() => State, (state) => state.cities)
+  state: State;
 
   @OneToMany(() => Listing, (listing) => listing.city)
   listings: Listing[];

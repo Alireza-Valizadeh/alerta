@@ -1,5 +1,12 @@
 import { Listing } from '../../listings/listing.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToOne,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
+import { Make } from './make.entity';
 
 @Entity({ name: 'Models' })
 export class Model {
@@ -8,6 +15,9 @@ export class Model {
 
   @Column({ type: 'varchar', length: 50, unique: true })
   title: string;
+
+  @ManyToOne(() => Make, (make) => make.models)
+  make: Make;
 
   @OneToMany(() => Listing, (listing) => listing.model)
   listings: Listing[];

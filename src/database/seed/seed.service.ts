@@ -13,6 +13,10 @@ import { State } from '../../common/entities/state.entity';
 import { Repository } from 'typeorm';
 import { MyLoggerService } from '../../logger/logger.service';
 import { PersianTranslations } from '../../common/enums/translations.enum';
+import * as IranStates from './provinces.json';
+import * as IranCities from './cities.json';
+import * as Makes from './makes.json';
+import * as Models from './models.json';
 
 @Injectable()
 export class SeedService implements OnModuleInit {
@@ -47,24 +51,17 @@ export class SeedService implements OnModuleInit {
     await this.seedFuelTypes();
     await this.seedEngineStates();
     await this.seedChassisStates();
-    // await this.seedModels();
-    // await this.seedStates();
-    // await this.seedCities();
+    await this.seedStatesAndCities();
+    await this.seedMakesAndModels();
   }
 
   async seedBodyStates() {
     const existingBodyStates = await this.bodyStateRepository.count();
     this.logger.log('Existing body states', existingBodyStates);
     if (existingBodyStates === 0) {
-      const bodyStatesToSeed = [
-        { title: 'سالم و بی خط و خش' },
-        { title: 'خط و خش جزیی' },
-        { title: 'یک تکه رنگ' },
-        { title: 'دو  تکه رنگ' },
-        { title: 'چند تکه رنگ' },
-        { title: 'بدون رنگ' },
-        { title: 'تمام رنگ' },
-      ];
+      const bodyStatesToSeed = Object.values(
+        PersianTranslations.BodyStates || {},
+      ).map((value) => ({ title: value }));
       await this.bodyStateRepository.save(bodyStatesToSeed);
     }
   }
@@ -73,7 +70,9 @@ export class SeedService implements OnModuleInit {
     const existingGearboxes = await this.gearboxRepository.count();
     this.logger.log('Existing Gearboxes', existingGearboxes);
     if (existingGearboxes === 0) {
-      const gearboxesToSeed = [{ title: 'دنده ای' }, { title: 'اتوماتیک' }];
+      const gearboxesToSeed = Object.values(
+        PersianTranslations.Gearboxes || {},
+      ).map((value) => ({ title: value }));
       await this.gearboxRepository.save(gearboxesToSeed);
     }
   }
@@ -82,21 +81,9 @@ export class SeedService implements OnModuleInit {
     const existingColors = await this.colorRepository.count();
     this.logger.log('Existing Colors', existingColors);
     if (existingColors === 0) {
-      const colorsToSeed = [
-        { title: 'سبز' },
-        { title: 'قرمز' },
-        { title: 'زرد' },
-        { title: 'آبی' },
-        { title: 'نارنجی' },
-        { title: 'نوک مدادی' },
-        { title: 'دلفینی' },
-        { title: 'مشکی' },
-        { title: 'سفید' },
-        { title: 'آلبایویی' },
-        { title: 'نقره ای' },
-        { title: 'سفید صدفی' },
-        { title: 'آبی آسمانی' },
-      ];
+      const colorsToSeed = Object.values(PersianTranslations.Colors || {}).map(
+        (value) => ({ title: value }),
+      );
       await this.colorRepository.save(colorsToSeed);
     }
   }
@@ -105,14 +92,9 @@ export class SeedService implements OnModuleInit {
     const existingFuelTypes = await this.fuelTypeRepository.count();
     this.logger.log('Existing Fuel Types', existingFuelTypes);
     if (existingFuelTypes === 0) {
-      const fuelTypesToSeed = [
-        { title: 'دیزل' },
-        { title: 'بنزینی' },
-        { title: 'برقی' },
-        { title: 'هیبرید' },
-        { title: 'دوگانه دستی' },
-        { title: 'دوگانه کارخانه' },
-      ];
+      const fuelTypesToSeed = Object.values(
+        PersianTranslations.FuelTypes || {},
+      ).map((value) => ({ title: value }));
       await this.fuelTypeRepository.save(fuelTypesToSeed);
     }
   }
@@ -121,11 +103,9 @@ export class SeedService implements OnModuleInit {
     const existingEngineStates = await this.engineStateRepository.count();
     this.logger.log('Existing Engine States', existingEngineStates);
     if (existingEngineStates === 0) {
-      const engineStatesToSeed = [
-        { title: 'سالم' },
-        { title: 'نیاز به تعمیر' },
-        { title: 'تعویض شده' },
-      ];
+      const engineStatesToSeed = Object.values(
+        PersianTranslations.EngineStates || {},
+      ).map((value) => ({ title: value }));
       await this.engineStateRepository.save(engineStatesToSeed);
     }
   }
@@ -135,9 +115,49 @@ export class SeedService implements OnModuleInit {
     this.logger.log('Existing Chassis States', existingChassisStates);
     if (existingChassisStates === 0) {
       const chassisStatesToSeed = Object.values(
-        PersianTranslations.ChassisState || {},
+        PersianTranslations.ChassisStates || {},
       ).map((value) => ({ title: value }));
       await this.chassisStateRepository.save(chassisStatesToSeed);
+    }
+  }
+
+  async seedStatesAndCities() {
+    const existingStates = await this.stateRepository.count();
+    const existingCities = await this.cityRepository.count();
+
+    this.logger.log('Existing States', existingStates);
+    this.logger.log('Existing Cities', existingCities);
+
+    if (existingStates === 0 && existingCities === 0) {
+      this.logger.log('Adding States and Cities');
+      const stateEntities = Array.from(IranStates)?.map((stateData) => ({
+        title: stateData.title,
+      }));
+      const savedStates = await this.stateRepository.save(stateEntities);
+      const citiesToSeed = Array.from(IranCities)?.map((cityData) => {
+        const state = savedStates.find(
+          (state) => state.title === cityData.provinceTitle,
+        ) as State;
+        return {
+          title: cityData.title,
+          state: state,
+        };
+      });
+      await this.cityRepository.save(citiesToSeed);
+    }
+  }
+  async seedMakesAndModels() {
+    const existingMakes = await this.makeRepository.count();
+    this.logger.log('Existing Makes', existingMakes);
+    if (existingMakes === 0) {
+      const makesToSeed = Array.from(Makes);
+      await this.makeRepository.save(makesToSeed);
+    }
+    const existingModels = await this.modelRepository.count();
+    this.logger.log('Existing Models', existingModels);
+    if (existingModels === 0) {
+      const modelsToSeed = Array.from(Models);
+      await this.modelRepository.save(modelsToSeed);
     }
   }
 }
