@@ -13,10 +13,14 @@ import { FuelType } from '../common/entities/fuelType.entity';
 import { Make } from '../common/entities/make.entity';
 import { Model } from '../common/entities/model.entity';
 import { State } from '../common/entities/state.entity';
+import { User } from '../users/user.entity';
 
 @Injectable()
 export class ListingsService {
+  private listingsRelations: string[];
   constructor(
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
     @InjectRepository(Listing)
     private listingsRepository: Repository<Listing>,
     @InjectRepository(Gearbox)
@@ -39,8 +43,24 @@ export class ListingsService {
     private modelsRepository: Repository<Model>,
     @InjectRepository(State)
     private statesRepository: Repository<Gearbox>,
-  ) {}
+  ) {
+    this.listingsRelations = [
+      'make',
+      'model',
+      'color',
+      'state',
+      'city',
+      'gearbox',
+      'bodyState',
+      'chassisState',
+      'engineState',
+      'fuelType',
+    ];
+  }
   async addListing(createListingDto: CreateListingDto): Promise<Listing> {
+    const user = await this.usersRepository.findOneBy({
+      id: createListingDto.uid,
+    });
     const gearbox = await this.gearboxesRepository.findOneBy({
       id: createListingDto.gearboxId,
     });
@@ -73,6 +93,7 @@ export class ListingsService {
     });
     const listing = this.listingsRepository.create({
       ...createListingDto,
+      user,
       gearbox,
       bodyState,
       chassisState,
@@ -89,22 +110,59 @@ export class ListingsService {
   async getListingById(id: number): Promise<Listing> {
     const listing = await this.listingsRepository.findOne({
       where: { id },
-      relations: [
-        'make',
-        'model',
-        'color',
-        'state',
-        'city',
-        'gearbox',
-        'fuelType',
-        'engineState',
-        'chassisState',
-        'bodyState',
-      ],
+      relations: this.listingsRelations,
     });
     if (!listing) {
       throw new NotFoundException(`Listing with ID ${id} not found`);
     }
     return listing;
+  }
+
+  getAllListings(): Promise<Listing[]> {
+    return this.listingsRepository.find({
+      relations: this.listingsRelations,
+    });
+  }
+
+  getUserListings(uid: number): Promise<Listing[]> {
+    return this.listingsRepository.findBy({
+      user: { id: uid },
+    });
+  }
+
+  async deleteListing(id: number): Promise<void> {
+    await this.listingsRepository.delete(id);
+  }
+
+  async getListingCreationData(): Promise<any> {
+    const [
+      makes,
+      colors,
+      states,
+      gearboxes,
+      fuelTypes,
+      engineStates,
+      chassisStates,
+      bodyStates,
+    ] = await Promise.all([
+      this.makesRepository.find(),
+      this.colorsRepository.find(),
+      this.statesRepository.find(),
+      this.gearboxesRepository.find(),
+      this.fuelTypesRepository.find(),
+      this.engineStatesRepository.find(),
+      this.chassisStatesRepository.find(),
+      this.bodyStatesRepository.find(),
+    ]);
+    return {
+      makes,
+      colors,
+      states,
+      gearboxes,
+      fuelTypes,
+      engineStates,
+      chassisStates,
+      bodyStates,
+    };
   }
 }

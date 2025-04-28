@@ -30,7 +30,7 @@ export class UsersController {
     return this.usersService.findOneById(request.user.sub);
   }
 
-  @Get('/all-users')
+  @Get()
   getAllUsers() {
     return this.usersService.findAll();
   }

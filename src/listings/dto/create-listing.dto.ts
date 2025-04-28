@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const createListingSchema = z.object({
+  uid: z.number().int().positive(), // Expect the ID of the User
   title: z.string().min(1).max(150),
   makeId: z.number().int().positive(), // Expect the ID of the Make
   modelId: z.number().int().positive(), // Expect the ID of the Model

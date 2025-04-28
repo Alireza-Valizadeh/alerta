@@ -14,6 +14,12 @@ import { GearboxesService } from './gearboxes/gearboxes.service';
 import { GearboxesController } from './gearboxes/gearboxes.controller';
 import { BodyStatesService } from './body-states/body-states.service';
 import { BodyStatesController } from './body-states/body-states.controller';
+import { FuelTypesService } from './fuel-types/fuel-types.service';
+import { FuelTypesController } from './fuel-types/fuel-types.controller';
+import { CitiesService } from './cities/cities.service';
+import { CitiesController } from './cities/cities.controller';
+import { ModelsService } from './models/models.service';
+import { ModelsController } from './models/models.controller';
 
 @Module({
   imports: [
@@ -30,8 +36,20 @@ import { BodyStatesController } from './body-states/body-states.controller';
       BodyState,
     ]),
   ],
-  providers: [GearboxesService, BodyStatesService],
-  controllers: [GearboxesController, BodyStatesController],
+  providers: [
+    GearboxesService,
+    BodyStatesService,
+    FuelTypesService,
+    CitiesService,
+    ModelsService,
+  ],
+  controllers: [
+    GearboxesController,
+    BodyStatesController,
+    FuelTypesController,
+    CitiesController,
+    ModelsController,
+  ],
   exports: [TypeOrmModule, GearboxesService],
 })
 export class CommonModule {}
