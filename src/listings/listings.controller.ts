@@ -17,15 +17,29 @@ import {
 import { ListingsService } from './listings.service';
 import { ZodValidationPipe } from '../pipes/zod-validation.pipe';
 import { Listing } from './listing.entity';
+import { createListingFromDivarDto } from './dto/create-listing-from-divar.dto';
+import { MyLoggerService } from '../logger/logger.service';
 
 @Controller('listings')
 export class ListingsController {
-  constructor(private listingsService: ListingsService) {}
+  constructor(
+    private listingsService: ListingsService,
+    private readonly logger: MyLoggerService,
+  ) {}
   @Post()
   @HttpCode(HttpStatus.CREATED)
   @UsePipes(new ZodValidationPipe(createListingSchema))
   createListing(@Body() createListingDto: CreateListingDto): Promise<Listing> {
     return this.listingsService.addListing(createListingDto);
+  }
+
+  @Post('crawl/divar')
+  @HttpCode(HttpStatus.CREATED)
+  createListingFromDivar(
+    @Body() createListingFromDivar: createListingFromDivarDto,
+  ): true {
+    this.logger.log('createListingFromDivar', createListingFromDivar);
+    return true;
   }
 
   @Get()
