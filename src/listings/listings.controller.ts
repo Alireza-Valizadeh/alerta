@@ -36,9 +36,10 @@ export class ListingsController {
   @Post('crawl/divar')
   @HttpCode(HttpStatus.CREATED)
   createListingFromDivar(
-    @Body() createListingFromDivar: createListingFromDivarDto,
+    @Body() createListingFromDivar: createListingFromDivarDto[],
   ): true {
     this.logger.log('createListingFromDivar', createListingFromDivar);
+    this.listingsService.addListingFromDivar(createListingFromDivar);
     return true;
   }
 
