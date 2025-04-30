@@ -11,9 +11,11 @@ import { Gearbox } from '../common/entities/gearbox.entity';
 import { Make } from '../common/entities/make.entity';
 import { Model } from '../common/entities/model.entity';
 import { State } from '../common/entities/state.entity';
+import { UsersModule } from '../users/users.module';
 
 @Module({
   imports: [
+    UsersModule,
     TypeOrmModule.forFeature([
       Make,
       Model,

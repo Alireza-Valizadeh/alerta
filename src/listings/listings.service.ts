@@ -48,6 +48,7 @@ export class ListingsService {
     private readonly logger: MyLoggerService,
   ) {
     this.listingsRelations = [
+      'user',
       'make',
       'model',
       'color',
@@ -116,8 +117,12 @@ export class ListingsService {
   ): Promise<Listing[]> {
     const listings: Listing[] = [];
     for (const info of cars) {
-      const listing = this.mapDivarToListing(info);
-      const savedListing = await this.addListing(listing);
+      const rawListing = this.mapDivarToListing(info);
+      const user = await this.usersRepository.findOneBy({
+        email: 'divar@gmail.com',
+      });
+      rawListing.uid = user.id;
+      const savedListing = await this.addListing(rawListing);
       listings.push(savedListing);
     }
     return listings;
@@ -184,11 +189,13 @@ export class ListingsService {
   private mapDivarToListing(info: createListingFromDivarDto): CreateListingDto {
     return {
       title: info.title,
-      description: info.details.description,
+      description: info.details.description.slice(0, 497).concat('...'),
       mileage: this.parseMileageToNumber(info.mileage),
       price: this.parsePriceToNumber(info.price),
       year: this.parseYearToNumber(info.details.year),
-      insuranceDuration: 0,
+      insuranceDuration: this.parseInsuranceToNumber(
+        info.details?.insuranceDuration,
+      ),
       isSold: false,
       isApproved: false,
     };
@@ -239,6 +246,21 @@ export class ListingsService {
       return isNaN(price) ? null : price;
     } catch (error) {
       this.logger.error('Error parsing price', error);
+      return null;
+    }
+  }
+  private parseInsuranceToNumber(priceString: string): number | null {
+    try {
+      const cleanedString = priceString
+        .replace(/ماه/g, '')
+        .replace(/٬|,/g, '')
+        .trim();
+
+      const englishNumerals = this.persianArabicToEnglish(cleanedString);
+      const insurance = parseInt(englishNumerals, 10);
+      return isNaN(insurance) ? null : insurance;
+    } catch (error) {
+      this.logger.error('Error parsing insurance', error);
       return null;
     }
   }

@@ -1,5 +1,6 @@
 import { Injectable, OnModuleInit } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
+import { User } from '../../users/user.entity';
 import { BodyState } from '../../common/entities/bodyState.entity';
 import { ChassisState } from '../../common/entities/chassisState.entity';
 import { City } from '../../common/entities/city.entity';
@@ -17,11 +18,14 @@ import * as IranStates from './provinces.json';
 import * as IranCities from './cities.json';
 import * as Makes from './makes.json';
 import * as Models from './models.json';
+import * as Users from './users.json';
 
 @Injectable()
 export class SeedService implements OnModuleInit {
   constructor(
     private readonly logger: MyLoggerService,
+    @InjectRepository(User)
+    private readonly userRepository: Repository<User>,
     @InjectRepository(Make)
     private readonly makeRepository: Repository<Make>,
     @InjectRepository(Model)
@@ -45,6 +49,7 @@ export class SeedService implements OnModuleInit {
   ) {}
 
   async onModuleInit() {
+    await this.seedUsers();
     await this.seedBodyStates();
     await this.seedGearboxes();
     await this.seedColors();
@@ -53,6 +58,15 @@ export class SeedService implements OnModuleInit {
     await this.seedChassisStates();
     await this.seedStatesAndCities();
     await this.seedMakesAndModels();
+  }
+
+  async seedUsers() {
+    const existingUsers = await this.userRepository.count();
+    this.logger.log('Existing Users', existingUsers);
+    if (existingUsers === 0) {
+      const usersToSeed = Array.from(Users);
+      await this.userRepository.save(usersToSeed);
+    }
   }
 
   async seedBodyStates() {

@@ -55,7 +55,7 @@ export class Listing {
   @JoinColumn({ name: 'cityId' })
   city: City;
 
-  @Column({ type: 'integer' })
+  @Column({ type: 'integer', nullable: true })
   insuranceDuration: number;
 
   @ManyToOne(() => Gearbox, (gearbox) => gearbox.listings)
