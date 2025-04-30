@@ -16,6 +16,7 @@ import { State } from '../common/entities/state.entity';
 import { User } from '../users/user.entity';
 import { createListingFromDivarDto } from './dto/create-listing-from-divar.dto';
 import { MyLoggerService } from '../logger/logger.service';
+import { PersianTranslations } from '../common/enums/translations.enum';
 
 @Injectable()
 export class ListingsService {
@@ -189,7 +190,30 @@ export class ListingsService {
       email: 'divar@gmail.com',
     });
     const gearbox = await this.gearboxesRepository.findOneBy({
-      title: info.details.transmission,
+      title: info.details.transmission || PersianTranslations.Gearboxes.Manual,
+    });
+    const bodyState = await this.bodyStatesRepository.findOneBy({
+      title: info.details.bodyState || PersianTranslations.BodyStates.Perfect,
+    });
+    const chassisState = await this.chassisStatesRepository.findOneBy({
+      title:
+        info.details.chassisState ||
+        PersianTranslations.ChassisStates.Undefined,
+    });
+    const color = await this.colorsRepository.findOneBy({
+      title: info.details.color || PersianTranslations.Colors.White,
+    });
+    const engineState = await this.engineStatesRepository.findOneBy({
+      title: info.details.engineState || PersianTranslations.EngineStates.Ok,
+    });
+    const fuelType = await this.fuelTypesRepository.findOneBy({
+      title: info.details.fuelType || PersianTranslations.FuelTypes.Petrol,
+    });
+    const city = await this.citiesRepository.findOneBy({
+      title: 'مشهد',
+    });
+    const state = await this.statesRepository.findOneBy({
+      title: 'خراسان رضوی',
     });
     // @ts-expect-error test
     const dto: Required<CreateListingDto> = {
@@ -205,6 +229,13 @@ export class ListingsService {
       isApproved: false,
       uid: user.id,
       gearboxId: gearbox.id,
+      bodyStateId: bodyState.id,
+      chassisStateId: chassisState.id,
+      colorId: color.id,
+      engineStateId: engineState.id,
+      fuelTypeId: fuelType.id,
+      cityId: city.id,
+      stateId: state.id,
     };
     return dto;
   }
@@ -257,9 +288,10 @@ export class ListingsService {
       return null;
     }
   }
-  private parseInsuranceToNumber(priceString: string): number | null {
+  private parseInsuranceToNumber(insuranceString: string): number | null {
     try {
-      const cleanedString = priceString
+      if (!insuranceString) return null;
+      const cleanedString = insuranceString
         .replace(/ماه/g, '')
         .replace(/٬|,/g, '')
         .trim();
