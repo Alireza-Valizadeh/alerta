@@ -117,11 +117,7 @@ export class ListingsService {
   ): Promise<Listing[]> {
     const listings: Listing[] = [];
     for (const info of cars) {
-      const rawListing = this.mapDivarToListing(info);
-      const user = await this.usersRepository.findOneBy({
-        email: 'divar@gmail.com',
-      });
-      rawListing.uid = user.id;
+      const rawListing = await this.mapDivarToListing(info);
       const savedListing = await this.addListing(rawListing);
       listings.push(savedListing);
     }
@@ -186,8 +182,17 @@ export class ListingsService {
       bodyStates,
     };
   }
-  private mapDivarToListing(info: createListingFromDivarDto): CreateListingDto {
-    return {
+  private async mapDivarToListing(
+    info: createListingFromDivarDto,
+  ): Promise<CreateListingDto> {
+    const user = await this.usersRepository.findOneBy({
+      email: 'divar@gmail.com',
+    });
+    const gearbox = await this.gearboxesRepository.findOneBy({
+      title: info.details.transmission,
+    });
+    // @ts-expect-error test
+    const dto: Required<CreateListingDto> = {
       title: info.title,
       description: info.details.description.slice(0, 497).concat('...'),
       mileage: this.parseMileageToNumber(info.mileage),
@@ -198,7 +203,10 @@ export class ListingsService {
       ),
       isSold: false,
       isApproved: false,
+      uid: user.id,
+      gearboxId: gearbox.id,
     };
+    return dto;
   }
   private persianArabicToEnglish(str: string) {
     const persianDigits = ['۰', '۱', '۲', '۳', '۴', '۵', '۶', '۷', '۸', '۹'];
