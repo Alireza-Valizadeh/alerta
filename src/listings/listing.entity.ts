@@ -26,6 +26,9 @@ export class Listing {
   @JoinColumn({ name: 'userId' })
   user: User;
 
+  @Column({ type: 'varchar', length: 150, unique: true, nullable: true })
+  link: string;
+
   @Column({ type: 'varchar', length: 150 })
   title: string;
 

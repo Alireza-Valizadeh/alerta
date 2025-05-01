@@ -16,5 +16,8 @@ export class createListingFromDivarDto {
     chassisState: string;
     insuranceDuration: string;
     transmission: string;
+    make: string;
+    model: string;
+    trim: string;
   };
 }

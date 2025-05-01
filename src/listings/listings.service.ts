@@ -120,6 +120,13 @@ export class ListingsService {
     for (const info of cars) {
       try {
         const rawListing = await this.mapDivarToListing(info);
+        const existingListing = await this.listingsRepository.findOne({
+          where: { link: rawListing.link },
+        });
+        if (existingListing) {
+          this.logger.log('Listing already exists, skipping', info.title);
+          continue;
+        }
         const savedListing = await this.addListing(rawListing);
         listings.push(savedListing);
       } catch (error) {
@@ -230,16 +237,27 @@ export class ListingsService {
       PersianTranslations.FuelTypes,
       'fuel type',
     );
+    const make = await this.makesRepository.findOneBy({
+      title: info.details.make,
+    });
+    let model = await this.modelsRepository.findOneBy({
+      title: info.details.make + ' ' + info.details.model,
+    });
+    if (make && !model) {
+      model = await this.modelsRepository.findOneBy({
+        title: PersianTranslations.GeneralStatements.Undefined,
+      });
+    }
     const city = await this.citiesRepository.findOneBy({
       title: 'مشهد',
     });
     const state = await this.statesRepository.findOneBy({
       title: 'خراسان رضوی',
     });
-    // @ts-expect-error test
     const dto: Required<CreateListingDto> = {
       title: info.title,
       description: info.details.description.slice(0, 497).concat('...'),
+      link: info.vdpUrl,
       mileage: this.parseMileageToNumber(info.mileage),
       price: this.parsePriceToNumber(info.price),
       year: this.parseYearToNumber(info.details.year),
@@ -257,6 +275,8 @@ export class ListingsService {
       fuelTypeId: fuelType.id,
       cityId: city.id,
       stateId: state.id,
+      makeId: make.id,
+      modelId: model.id,
     };
     return dto;
   }

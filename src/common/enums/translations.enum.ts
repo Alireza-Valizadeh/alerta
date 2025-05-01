@@ -1,3 +1,7 @@
+export enum PersianGeneralStatements {
+  Undefined = 'تعیین‌نشده',
+}
+
 export enum PersianChassisStates {
   Undefined = 'تعیین‌نشده',
   BothOk = 'سالم و پلمپ',
@@ -6,6 +10,7 @@ export enum PersianChassisStates {
   OnlyFrontOk = 'شاسی جلو سالم، شاسی عفب ضربه خورده',
   OnlyBackOk = 'شاسی جلو ضربه خورده، شاسی عفب سالم',
 }
+
 export enum PersianEngineStates {
   Undefined = 'تعیین‌نشده',
   Ok = 'سالم',
@@ -91,4 +96,5 @@ export const PersianTranslations = {
   Colors: PersianColors,
   FuelTypes: PersianFuelTypes,
   Gearboxes: PersianGearboxes,
+  GeneralStatements: PersianGeneralStatements,
 };

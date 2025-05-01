@@ -18,6 +18,7 @@ export const createListingSchema = z.object({
   chassisStateId: z.number().int().positive(), // Expect the ID of the ChassisState
   bodyStateId: z.number().int().positive(), // Expect the ID of the BodyState
   description: z.string().max(200).optional(),
+  link: z.string().max(150).optional(),
   isApproved: z.boolean().default(false),
   isSold: z.boolean().default(false),
 });
