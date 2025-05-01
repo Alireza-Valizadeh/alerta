@@ -162,15 +162,23 @@ export class SeedService implements OnModuleInit {
   }
   async seedMakesAndModels() {
     const existingMakes = await this.makeRepository.count();
-    this.logger.log('Existing Makes', existingMakes);
-    if (existingMakes === 0) {
-      const makesToSeed = Array.from(Makes);
-      await this.makeRepository.save(makesToSeed);
-    }
     const existingModels = await this.modelRepository.count();
+    this.logger.log('Existing Makes', existingMakes);
     this.logger.log('Existing Models', existingModels);
-    if (existingModels === 0) {
-      const modelsToSeed = Array.from(Models);
+
+    if (existingMakes === 0 && existingModels === 0) {
+      this.logger.log('Adding Makes and Models');
+      const makesToSeed = Array.from(Makes);
+      const savedMakes = await this.makeRepository.save(makesToSeed);
+      const modelsToSeed = Array.from(Models)?.map((modelData) => {
+        const make = savedMakes.find(
+          (make) => make.title === modelData.makeTitle,
+        ) as Make;
+        return {
+          title: modelData.title,
+          make: make,
+        };
+      });
       await this.modelRepository.save(modelsToSeed);
     }
   }

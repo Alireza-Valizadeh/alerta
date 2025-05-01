@@ -118,9 +118,14 @@ export class ListingsService {
   ): Promise<Listing[]> {
     const listings: Listing[] = [];
     for (const info of cars) {
-      const rawListing = await this.mapDivarToListing(info);
-      const savedListing = await this.addListing(rawListing);
-      listings.push(savedListing);
+      try {
+        const rawListing = await this.mapDivarToListing(info);
+        const savedListing = await this.addListing(rawListing);
+        listings.push(savedListing);
+      } catch (error) {
+        this.logger.error('Error adding listing from divar', info, error);
+        continue;
+      }
     }
     return listings;
   }
@@ -189,26 +194,42 @@ export class ListingsService {
     const user = await this.usersRepository.findOneBy({
       email: 'divar@gmail.com',
     });
-    const gearbox = await this.gearboxesRepository.findOneBy({
-      title: info.details.transmission || PersianTranslations.Gearboxes.Manual,
-    });
-    const bodyState = await this.bodyStatesRepository.findOneBy({
-      title: info.details.bodyState || PersianTranslations.BodyStates.Perfect,
-    });
-    const chassisState = await this.chassisStatesRepository.findOneBy({
-      title:
-        info.details.chassisState ||
-        PersianTranslations.ChassisStates.Undefined,
-    });
-    const color = await this.colorsRepository.findOneBy({
-      title: info.details.color || PersianTranslations.Colors.White,
-    });
-    const engineState = await this.engineStatesRepository.findOneBy({
-      title: info.details.engineState || PersianTranslations.EngineStates.Ok,
-    });
-    const fuelType = await this.fuelTypesRepository.findOneBy({
-      title: info.details.fuelType || PersianTranslations.FuelTypes.Petrol,
-    });
+    const gearbox = await this.findLookupEntityByTitle(
+      this.gearboxesRepository,
+      info.details.transmission,
+      PersianTranslations.Gearboxes,
+      'gearbox',
+    );
+    const bodyState = await this.findLookupEntityByTitle(
+      this.bodyStatesRepository,
+      info.details.bodyState,
+      PersianTranslations.BodyStates,
+      'body state',
+    );
+    const chassisState = await this.findLookupEntityByTitle(
+      this.chassisStatesRepository,
+      info.details.chassisState,
+      PersianTranslations.ChassisStates,
+      'chassis state',
+    );
+    const color = await this.findLookupEntityByTitle(
+      this.colorsRepository,
+      info.details.color,
+      PersianTranslations.Colors,
+      'color',
+    );
+    const engineState = await this.findLookupEntityByTitle(
+      this.engineStatesRepository,
+      info.details.engineState,
+      PersianTranslations.EngineStates,
+      'engine state',
+    );
+    const fuelType = await this.findLookupEntityByTitle(
+      this.fuelTypesRepository,
+      info.details.fuelType,
+      PersianTranslations.FuelTypes,
+      'fuel type',
+    );
     const city = await this.citiesRepository.findOneBy({
       title: 'مشهد',
     });
@@ -313,5 +334,27 @@ export class ListingsService {
       this.logger.error('Error parsing year', error);
       return null;
     }
+  }
+  private async findLookupEntityByTitle<T extends { title: string }>(
+    repository: Repository<T>,
+    title: string | null,
+    translations: Record<string, string>,
+    entityName: string,
+  ): Promise<T | null> {
+    const defaultTitle = translations?.Undefined;
+    const searchTerm = title || defaultTitle;
+    this.logger.log(`Searching for ${entityName}: ${searchTerm}`);
+
+    let entity = await repository.findOneBy({ title: searchTerm } as any);
+    if (entity) return entity;
+
+    for (const keyword of Object.values(translations || {})) {
+      this.logger.log(`Searching for ${entityName} with keyword: ${keyword}`);
+      if (searchTerm?.includes(keyword)) {
+        entity = await repository.findOneBy({ title: keyword } as any);
+        if (entity) return entity;
+      }
+    }
+    return null;
   }
 }
