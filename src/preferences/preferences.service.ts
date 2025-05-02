@@ -1,4 +1,267 @@
-import { Injectable } from '@nestjs/common';
+import {
+  ForbiddenException,
+  Injectable,
+  NotFoundException,
+  UsePipes,
+} from '@nestjs/common';
+import { InjectRepository } from '@nestjs/typeorm';
+import { Preference } from './preference.entity';
+import { In, Repository } from 'typeorm';
+import {
+  createPreferenceSchema,
+  CreatePreferenceSchema,
+  updatePreferenceSchema,
+  UpdatePreferenceSchema,
+} from './dto/preference.dto';
+import { ZodValidationPipe } from '../pipes/zod-validation.pipe';
+import { BodyState } from '../common/entities/bodyState.entity';
+import { ChassisState } from '../common/entities/chassisState.entity';
+import { City } from '../common/entities/city.entity';
+import { Color } from '../common/entities/color.entity';
+import { EngineState } from '../common/entities/engineState.entity';
+import { FuelType } from '../common/entities/fuelType.entity';
+import { Gearbox } from '../common/entities/gearbox.entity';
+import { Make } from '../common/entities/make.entity';
+import { Model } from '../common/entities/model.entity';
+import { State } from '../common/entities/state.entity';
+import { User } from '../users/user.entity';
+import { MyLoggerService } from '../logger/logger.service';
 
 @Injectable()
-export class PreferencesService {}
+export class PreferencesService {
+  private relations: string[];
+  constructor(
+    @InjectRepository(Preference)
+    private readonly preferenceRepository: Repository<Preference>,
+    @InjectRepository(User)
+    private usersRepository: Repository<User>,
+    @InjectRepository(Gearbox)
+    private gearboxesRepository: Repository<Gearbox>,
+    @InjectRepository(BodyState)
+    private bodyStatesRepository: Repository<BodyState>,
+    @InjectRepository(ChassisState)
+    private chassisStatesRepository: Repository<ChassisState>,
+    @InjectRepository(City)
+    private citiesRepository: Repository<City>,
+    @InjectRepository(Color)
+    private colorsRepository: Repository<Color>,
+    @InjectRepository(EngineState)
+    private engineStatesRepository: Repository<EngineState>,
+    @InjectRepository(FuelType)
+    private fuelTypesRepository: Repository<FuelType>,
+    @InjectRepository(Make)
+    private makesRepository: Repository<Make>,
+    @InjectRepository(Model)
+    private modelsRepository: Repository<Model>,
+    @InjectRepository(State)
+    private statesRepository: Repository<State>,
+    private logger: MyLoggerService,
+  ) {
+    this.relations = [
+      'user',
+      'make',
+      'model',
+      'state',
+      'city',
+      'colors',
+      'gearboxes',
+      'fuelTypes',
+      'engineStates',
+      'chassisStates',
+      'bodyStates',
+    ];
+  }
+
+  @UsePipes(new ZodValidationPipe(createPreferenceSchema))
+  async create(
+    uid: number,
+    createPreferenceDto: CreatePreferenceSchema,
+  ): Promise<Preference> {
+    const user = await this.usersRepository.findOneBy({
+      id: uid,
+    });
+    const state = await this.statesRepository.findOneBy({
+      id: createPreferenceDto.stateId,
+    });
+    const city = await this.citiesRepository.findOneBy({
+      id: createPreferenceDto.cityId,
+    });
+    const make = await this.makesRepository.findOneBy({
+      id: createPreferenceDto.makeId,
+    });
+    const model = await this.modelsRepository.findOneBy({
+      id: createPreferenceDto.modelId,
+    });
+    const colors = await this.findEntitiesByIds<Color>(
+      this.colorsRepository,
+      createPreferenceDto.colorIds,
+    );
+    const gearboxes = await this.findEntitiesByIds<Gearbox>(
+      this.gearboxesRepository,
+      createPreferenceDto.gearboxIds,
+    );
+    const fuelTypes = await this.findEntitiesByIds<FuelType>(
+      this.fuelTypesRepository,
+      createPreferenceDto.fuelTypeIds,
+    );
+    const engineStates = await this.findEntitiesByIds<EngineState>(
+      this.engineStatesRepository,
+      createPreferenceDto.engineStateIds,
+    );
+    const chassisStates = await this.findEntitiesByIds<ChassisState>(
+      this.chassisStatesRepository,
+      createPreferenceDto.chassisStateIds,
+    );
+    const bodyStates = await this.findEntitiesByIds<BodyState>(
+      this.bodyStatesRepository,
+      createPreferenceDto.bodyStateIds,
+    );
+    const preference = this.preferenceRepository.create({
+      ...createPreferenceDto,
+      user,
+      state,
+      city,
+      make,
+      model,
+      colors,
+      gearboxes,
+      fuelTypes,
+      engineStates,
+      chassisStates,
+      bodyStates,
+    });
+    return this.preferenceRepository.save(preference);
+  }
+
+  async findAll(): Promise<Preference[]> {
+    return this.preferenceRepository.find({
+      relations: this.relations,
+    });
+  }
+
+  async findOne(id: number): Promise<Preference | null> {
+    const preference = await this.preferenceRepository.findOne({
+      where: { id },
+      relations: this.relations,
+    });
+    return preference as Preference | null;
+  }
+
+  @UsePipes(new ZodValidationPipe(updatePreferenceSchema))
+  async update(
+    uid: number,
+    id: number,
+    updatePreferenceDto: UpdatePreferenceSchema,
+  ): Promise<Preference | null> {
+    const existingPreference = await this.preferenceRepository.findOne({
+      where: { id },
+      relations: this.relations,
+    });
+    if (!existingPreference) {
+      throw new NotFoundException(`Preference with ID ${id} not found`);
+    }
+    Object.assign(existingPreference, updatePreferenceDto);
+
+    if (existingPreference.user.id !== uid) {
+      throw new ForbiddenException(
+        'You are not authorized to update this preference',
+      );
+    }
+    if (updatePreferenceDto.makeId) {
+      existingPreference.make = await this.makesRepository.findOneBy({
+        id: updatePreferenceDto.makeId,
+      });
+    }
+    if (updatePreferenceDto.modelId) {
+      existingPreference.model = await this.modelsRepository.findOneBy({
+        id: updatePreferenceDto.modelId,
+      });
+    }
+    if (updatePreferenceDto.stateId) {
+      existingPreference.state = await this.statesRepository.findOneBy({
+        id: updatePreferenceDto.stateId,
+      });
+    }
+    if (updatePreferenceDto.cityId) {
+      existingPreference.city = await this.citiesRepository.findOneBy({
+        id: updatePreferenceDto.cityId,
+      });
+    }
+    if (updatePreferenceDto.colorIds) {
+      existingPreference.colors = await this.colorsRepository.findBy({
+        id: In(updatePreferenceDto.colorIds),
+      });
+    }
+    if (updatePreferenceDto.gearboxIds) {
+      existingPreference.gearboxes = await this.gearboxesRepository.findBy({
+        id: In(updatePreferenceDto.gearboxIds),
+      });
+    }
+    if (updatePreferenceDto.fuelTypeIds) {
+      existingPreference.fuelTypes = await this.fuelTypesRepository.findBy({
+        id: In(updatePreferenceDto.fuelTypeIds),
+      });
+    }
+    if (updatePreferenceDto.engineStateIds) {
+      existingPreference.engineStates =
+        await this.engineStatesRepository.findBy({
+          id: In(updatePreferenceDto.engineStateIds),
+        });
+    }
+    if (updatePreferenceDto.chassisStateIds) {
+      existingPreference.chassisStates =
+        await this.chassisStatesRepository.findBy({
+          id: In(updatePreferenceDto.chassisStateIds),
+        });
+    }
+    if (updatePreferenceDto.bodyStateIds) {
+      existingPreference.bodyStates = await this.bodyStatesRepository.findBy({
+        id: In(updatePreferenceDto.bodyStateIds),
+      });
+    }
+    await this.preferenceRepository.update(id, existingPreference);
+    return this.findOne(id);
+  }
+
+  async delete(id: number): Promise<void> {
+    const preference = await this.findOne(id);
+    if (!preference) {
+      throw new NotFoundException(`Preference with ID ${id} not found`);
+    }
+    await this.preferenceRepository.delete(id);
+  }
+
+  async findMatchingPreferences(carListing: any): Promise<Preference[]> {
+    return this.preferenceRepository
+      .createQueryBuilder('preference')
+      .where(
+        'preference.minPrice IS NULL OR :carPrice >= preference.minPrice',
+        {
+          carPrice: carListing.price,
+        },
+      )
+      .andWhere(
+        'preference.maxPrice IS NULL OR :carPrice <= preference.maxPrice',
+        {
+          carPrice: carListing.price,
+        },
+      )
+      .getMany();
+  }
+
+  private async findEntitiesByIds<T>(
+    repository: Repository<T>,
+    ids: number[],
+  ): Promise<T[]> {
+    try {
+      const entities = await repository
+        .createQueryBuilder('entity')
+        .where('entity.id IN (:...ids)', { ids })
+        .getMany();
+      return entities;
+    } catch (error) {
+      this.logger.log('Error finding entities by ids', error);
+      return [];
+    }
+  }
+}

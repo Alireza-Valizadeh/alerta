@@ -1,6 +1,6 @@
 import { z } from 'zod';
 
-export const basePreferenceSchema = z.object({
+export const createPreferenceSchema = z.object({
   minYear: z.number().int().nullable(),
   maxYear: z.number().int().nullable(),
   minInsuranceDuration: z.number().int().nullable(),
@@ -20,7 +20,7 @@ export const basePreferenceSchema = z.object({
   chassisStateIds: z.array(z.number().int()).optional(),
   bodyStateIds: z.array(z.number().int()).optional(),
 });
-export const updatePreferenceSchema = basePreferenceSchema.partial();
+export const updatePreferenceSchema = createPreferenceSchema.partial();
 
-export type CreatePreferenceSchema = z.infer<typeof basePreferenceSchema>;
+export type CreatePreferenceSchema = z.infer<typeof createPreferenceSchema>;
 export type UpdatePreferenceSchema = z.infer<typeof updatePreferenceSchema>;

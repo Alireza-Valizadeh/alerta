@@ -45,7 +45,7 @@ export class ListingsService {
     @InjectRepository(Model)
     private modelsRepository: Repository<Model>,
     @InjectRepository(State)
-    private statesRepository: Repository<Gearbox>,
+    private statesRepository: Repository<State>,
     private readonly logger: MyLoggerService,
   ) {
     this.listingsRelations = [
