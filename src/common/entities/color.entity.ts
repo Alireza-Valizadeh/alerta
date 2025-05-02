@@ -1,5 +1,12 @@
+import { Preference } from '../../preferences/preference.entity';
 import { Listing } from '../../listings/listing.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'Colors' })
 export class Color {
@@ -11,4 +18,7 @@ export class Color {
 
   @OneToMany(() => Listing, (listing) => listing.color)
   listings: Listing[];
+
+  @ManyToMany(() => Preference, (preference) => preference.colors)
+  preferences: Preference[];
 }

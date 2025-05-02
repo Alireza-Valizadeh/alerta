@@ -1,5 +1,12 @@
+import { Preference } from '../../preferences/preference.entity';
 import { Listing } from '../../listings/listing.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'Gearboxes' })
 export class Gearbox {
@@ -11,4 +18,7 @@ export class Gearbox {
 
   @OneToMany(() => Listing, (listing) => listing.gearbox)
   listings: Listing[];
+
+  @ManyToMany(() => Preference, (preference) => preference.gearboxes)
+  preferences: Preference[];
 }

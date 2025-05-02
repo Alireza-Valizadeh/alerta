@@ -7,6 +7,7 @@ import {
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { State } from './state.entity';
+import { Preference } from '../../preferences/preference.entity';
 
 @Entity({ name: 'Cities' })
 export class City {
@@ -21,4 +22,7 @@ export class City {
 
   @OneToMany(() => Listing, (listing) => listing.city)
   listings: Listing[];
+
+  @OneToMany(() => Preference, (preference) => preference.city)
+  preferences: Preference[];
 }

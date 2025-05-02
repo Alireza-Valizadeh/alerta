@@ -1,6 +1,7 @@
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { Gender } from './enums/genders.enum';
 import { Listing } from '../listings/listing.entity';
+import { Preference } from '../preferences/preference.entity';
 
 @Entity({ name: 'Users' })
 export class User {
@@ -30,4 +31,7 @@ export class User {
 
   @OneToMany(() => Listing, (listing) => listing.user)
   listings: Listing[];
+
+  @OneToMany(() => Preference, (preference) => preference.user)
+  preferences: Preference[];
 }

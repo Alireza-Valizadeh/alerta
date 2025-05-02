@@ -1,5 +1,12 @@
+import { Preference } from '../../preferences/preference.entity';
 import { Listing } from '../../listings/listing.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'FuelTypes' })
 export class FuelType {
@@ -11,4 +18,7 @@ export class FuelType {
 
   @OneToMany(() => Listing, (listing) => listing.fuelType)
   listings: Listing[];
+
+  @ManyToMany(() => Preference, (preference) => preference.fuelTypes)
+  preferences: Preference[];
 }

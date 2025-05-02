@@ -1,6 +1,7 @@
 import { Listing } from '../../listings/listing.entity';
 import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
 import { City } from './city.entity';
+import { Preference } from '../../preferences/preference.entity';
 
 @Entity({ name: 'States' })
 export class State {
@@ -15,4 +16,7 @@ export class State {
 
   @OneToMany(() => Listing, (listing) => listing.state)
   listings: Listing[];
+
+  @OneToMany(() => Preference, (preference) => preference.state)
+  preferences: Preference[];
 }

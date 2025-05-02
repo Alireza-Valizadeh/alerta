@@ -1,5 +1,12 @@
+import { Preference } from '../../preferences/preference.entity';
 import { Listing } from '../../listings/listing.entity';
-import { Column, Entity, OneToMany, PrimaryGeneratedColumn } from 'typeorm';
+import {
+  Column,
+  Entity,
+  ManyToMany,
+  OneToMany,
+  PrimaryGeneratedColumn,
+} from 'typeorm';
 
 @Entity({ name: 'EngineStates' })
 export class EngineState {
@@ -11,4 +18,7 @@ export class EngineState {
 
   @OneToMany(() => Listing, (listing) => listing.engineState)
   listings: Listing[];
+
+  @ManyToMany(() => Preference, (preference) => preference.engineStates)
+  preferences: Preference[];
 }
