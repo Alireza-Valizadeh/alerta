@@ -22,5 +22,5 @@ export const createPreferenceSchema = z.object({
 });
 export const updatePreferenceSchema = createPreferenceSchema.partial();
 
-export type CreatePreferenceSchema = z.infer<typeof createPreferenceSchema>;
-export type UpdatePreferenceSchema = z.infer<typeof updatePreferenceSchema>;
+export type CreatePreferenceDto = z.infer<typeof createPreferenceSchema>;
+export type UpdatePreferenceDto = z.infer<typeof updatePreferenceSchema>;

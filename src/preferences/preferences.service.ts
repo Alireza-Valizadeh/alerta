@@ -8,10 +8,9 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { Preference } from './preference.entity';
 import { In, Repository } from 'typeorm';
 import {
-  createPreferenceSchema,
-  CreatePreferenceSchema,
+  CreatePreferenceDto,
   updatePreferenceSchema,
-  UpdatePreferenceSchema,
+  UpdatePreferenceDto,
 } from './dto/preference.dto';
 import { ZodValidationPipe } from '../pipes/zod-validation.pipe';
 import { BodyState } from '../common/entities/bodyState.entity';
@@ -63,20 +62,21 @@ export class PreferencesService {
       'model',
       'state',
       'city',
-      'colors',
-      'gearboxes',
-      'fuelTypes',
-      'engineStates',
-      'chassisStates',
-      'bodyStates',
+      // 'colors',
+      // 'gearboxes',
+      // 'bodyStates',
+      // 'chassisStates',
+      // 'engineStates',
+      // 'fuelTypes',
     ];
   }
 
-  @UsePipes(new ZodValidationPipe(createPreferenceSchema))
   async create(
     uid: number,
-    createPreferenceDto: CreatePreferenceSchema,
+    createPreferenceDto: CreatePreferenceDto,
   ): Promise<Preference> {
+    this.logger.log('Creating preference', createPreferenceDto);
+
     const user = await this.usersRepository.findOneBy({
       id: uid,
     });
@@ -151,8 +151,9 @@ export class PreferencesService {
   async update(
     uid: number,
     id: number,
-    updatePreferenceDto: UpdatePreferenceSchema,
+    updatePreferenceDto: UpdatePreferenceDto,
   ): Promise<Preference | null> {
+    this.logger.log('Updating preference', { id }, { updatePreferenceDto });
     const existingPreference = await this.preferenceRepository.findOne({
       where: { id },
       relations: this.relations,
@@ -223,12 +224,22 @@ export class PreferencesService {
     return this.findOne(id);
   }
 
-  async delete(id: number): Promise<void> {
-    const preference = await this.findOne(id);
+  async delete(uid: number, id: number): Promise<Preference> {
+    this.logger.log('Deleting preference', id);
+    const preference = await this.preferenceRepository.findOne({
+      where: { id },
+      relations: ['user'],
+    });
     if (!preference) {
       throw new NotFoundException(`Preference with ID ${id} not found`);
     }
-    await this.preferenceRepository.delete(id);
+    if (preference.user.id !== uid) {
+      throw new ForbiddenException(
+        'You are not authorized to delete this preference',
+      );
+    }
+    await this.preferenceRepository.softDelete(id);
+    return preference;
   }
 
   async findMatchingPreferences(carListing: any): Promise<Preference[]> {
