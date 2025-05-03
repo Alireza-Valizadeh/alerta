@@ -2,17 +2,11 @@ import {
   ForbiddenException,
   Injectable,
   NotFoundException,
-  UsePipes,
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Preference } from './preference.entity';
-import { In, Repository } from 'typeorm';
-import {
-  CreatePreferenceDto,
-  updatePreferenceSchema,
-  UpdatePreferenceDto,
-} from './dto/preference.dto';
-import { ZodValidationPipe } from '../pipes/zod-validation.pipe';
+import { DataSource, In, Repository } from 'typeorm';
+import { CreatePreferenceDto, UpdatePreferenceDto } from './dto/preference.dto';
 import { BodyState } from '../common/entities/bodyState.entity';
 import { ChassisState } from '../common/entities/chassisState.entity';
 import { City } from '../common/entities/city.entity';
@@ -55,6 +49,7 @@ export class PreferencesService {
     @InjectRepository(State)
     private statesRepository: Repository<State>,
     private logger: MyLoggerService,
+    private dataSource: DataSource,
   ) {
     this.relations = [
       'user',
@@ -62,12 +57,12 @@ export class PreferencesService {
       'model',
       'state',
       'city',
-      // 'colors',
-      // 'gearboxes',
-      // 'bodyStates',
-      // 'chassisStates',
-      // 'engineStates',
-      // 'fuelTypes',
+      'colors',
+      'gearboxes',
+      'bodyStates',
+      'chassisStates',
+      'engineStates',
+      'fuelTypes',
     ];
   }
 
@@ -147,7 +142,6 @@ export class PreferencesService {
     return preference as Preference | null;
   }
 
-  @UsePipes(new ZodValidationPipe(updatePreferenceSchema))
   async update(
     uid: number,
     id: number,
@@ -189,9 +183,11 @@ export class PreferencesService {
       });
     }
     if (updatePreferenceDto.colorIds) {
+      this.logger.log('#1 Finding colors', existingPreference.colors);
       existingPreference.colors = await this.colorsRepository.findBy({
         id: In(updatePreferenceDto.colorIds),
       });
+      this.logger.log('#2 Finding colors', existingPreference.colors);
     }
     if (updatePreferenceDto.gearboxIds) {
       existingPreference.gearboxes = await this.gearboxesRepository.findBy({
@@ -220,7 +216,7 @@ export class PreferencesService {
         id: In(updatePreferenceDto.bodyStateIds),
       });
     }
-    await this.preferenceRepository.update(id, existingPreference);
+    await this.preferenceRepository.save(existingPreference);
     return this.findOne(id);
   }
 
@@ -262,9 +258,12 @@ export class PreferencesService {
 
   private async findEntitiesByIds<T>(
     repository: Repository<T>,
-    ids: number[],
+    ids: number[] | null,
   ): Promise<T[]> {
     try {
+      if (!ids || ids.length === 0) {
+        return [];
+      }
       const entities = await repository
         .createQueryBuilder('entity')
         .where('entity.id IN (:...ids)', { ids })

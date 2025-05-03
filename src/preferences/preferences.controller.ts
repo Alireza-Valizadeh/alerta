@@ -49,11 +49,11 @@ export class PreferencesController {
 
   @Put(':id')
   @UseGuards(AuthGuard)
-  @UsePipes(new ZodValidationPipe(updatePreferenceSchema))
   update(
-    @Request() request,
     @Param('id', ParseIntPipe) id: number,
-    @Body() updatePreferenceDto: UpdatePreferenceDto,
+    @Body(new ZodValidationPipe(updatePreferenceSchema))
+    updatePreferenceDto: UpdatePreferenceDto,
+    @Request() request,
   ): Promise<Preference> {
     const uid = request.user.sub;
     return this.preferencesService.update(uid, id, updatePreferenceDto);

@@ -3,6 +3,7 @@ import { Listing } from '../../listings/listing.entity';
 import {
   Column,
   Entity,
+  JoinTable,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -20,5 +21,10 @@ export class EngineState {
   listings: Listing[];
 
   @ManyToMany(() => Preference, (preference) => preference.engineStates)
+  @JoinTable({
+    name: 'preference_engineStates',
+    joinColumn: { name: 'engineStateId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'preferenceId', referencedColumnName: 'id' },
+  })
   preferences: Preference[];
 }

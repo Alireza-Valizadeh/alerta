@@ -3,6 +3,7 @@ import { Listing } from '../../listings/listing.entity';
 import {
   Column,
   Entity,
+  JoinTable,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -20,5 +21,10 @@ export class FuelType {
   listings: Listing[];
 
   @ManyToMany(() => Preference, (preference) => preference.fuelTypes)
+  @JoinTable({
+    name: 'preference_fuelTypes',
+    joinColumn: { name: 'fuelTypeId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'preferenceId', referencedColumnName: 'id' },
+  })
   preferences: Preference[];
 }

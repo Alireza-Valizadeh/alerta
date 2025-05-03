@@ -11,6 +11,7 @@ import { State } from '../common/entities/state.entity';
 import { User } from '../users/user.entity';
 import {
   Column,
+  DeleteDateColumn,
   Entity,
   JoinColumn,
   ManyToMany,
@@ -83,4 +84,7 @@ export class Preference {
 
   @ManyToMany(() => BodyState, (bodyState) => bodyState.preferences)
   bodyStates: BodyState[];
+
+  @DeleteDateColumn({ type: 'timestamp' })
+  deletedAt: Date;
 }

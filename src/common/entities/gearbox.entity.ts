@@ -3,6 +3,7 @@ import { Listing } from '../../listings/listing.entity';
 import {
   Column,
   Entity,
+  JoinTable,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -20,5 +21,10 @@ export class Gearbox {
   listings: Listing[];
 
   @ManyToMany(() => Preference, (preference) => preference.gearboxes)
+  @JoinTable({
+    name: 'preference_gearboxes',
+    joinColumn: { name: 'gearboxId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'preferenceId', referencedColumnName: 'id' },
+  })
   preferences: Preference[];
 }

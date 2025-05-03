@@ -3,6 +3,7 @@ import { Listing } from '../../listings/listing.entity';
 import {
   Column,
   Entity,
+  JoinTable,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -20,5 +21,10 @@ export class BodyState {
   listings: Listing[];
 
   @ManyToMany(() => Preference, (preference) => preference.bodyStates)
+  @JoinTable({
+    name: 'preference_bodyStates',
+    joinColumn: { name: 'bodyStateId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'preferenceId', referencedColumnName: 'id' },
+  })
   preferences: Preference[];
 }

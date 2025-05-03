@@ -3,6 +3,7 @@ import { Listing } from '../../listings/listing.entity';
 import {
   Column,
   Entity,
+  JoinTable,
   ManyToMany,
   OneToMany,
   PrimaryGeneratedColumn,
@@ -20,5 +21,10 @@ export class Color {
   listings: Listing[];
 
   @ManyToMany(() => Preference, (preference) => preference.colors)
+  @JoinTable({
+    name: 'preference_colors',
+    joinColumn: { name: 'colorId', referencedColumnName: 'id' },
+    inverseJoinColumn: { name: 'preferenceId', referencedColumnName: 'id' },
+  })
   preferences: Preference[];
 }
