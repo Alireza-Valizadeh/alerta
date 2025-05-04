@@ -17,6 +17,8 @@ import { User } from '../users/user.entity';
 import { createListingFromDivarDto } from './dto/create-listing-from-divar.dto';
 import { MyLoggerService } from '../logger/logger.service';
 import { PersianTranslations } from '../common/enums/translations.enum';
+import { NotificationsService } from '../notifications/notifications.service';
+import { PreferencesService } from '../preferences/preferences.service';
 
 @Injectable()
 export class ListingsService {
@@ -47,6 +49,8 @@ export class ListingsService {
     @InjectRepository(State)
     private statesRepository: Repository<State>,
     private readonly logger: MyLoggerService,
+    private notifService: NotificationsService,
+    private preferencesService: PreferencesService,
   ) {
     this.listingsRelations = [
       'user',
@@ -132,6 +136,16 @@ export class ListingsService {
       } catch (error) {
         this.logger.error('Error adding listing from divar', info, error);
         continue;
+      }
+    }
+    for (const listing of listings) {
+      const matchingPrefs =
+        await this.preferencesService.findMatchingPreferences(listing);
+      for (const pref of matchingPrefs) {
+        await this.notifService.sendSandboxSms(
+          pref.user.phone,
+          `Found a new car matching your alarm: ${listing.title}`,
+        );
       }
     }
     return listings;
@@ -369,7 +383,7 @@ export class ListingsService {
     if (entity) return entity;
 
     for (const keyword of Object.values(translations || {})) {
-      this.logger.log(`Searching for ${entityName} with keyword: ${keyword}`);
+      // this.logger.log(`Searching for ${entityName} with keyword: ${keyword}`);
       if (searchTerm?.includes(keyword)) {
         entity = await repository.findOneBy({ title: keyword } as any);
         if (entity) return entity;

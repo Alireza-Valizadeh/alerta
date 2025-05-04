@@ -1,6 +1,6 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { notificationConstants } from './constants';
+// import { notificationConstants } from './constants';
 import { MyLoggerService } from '../logger/logger.service';
 
 @Injectable()
@@ -11,10 +11,11 @@ export class NotificationsService {
   ) {}
   async sendSandboxSms(phone: string, text: string) {
     try {
-      const apiKey = this.configService.get('NOTIF_API_KEY');
-      const { apiUrl, username, line } = notificationConstants;
-      const url = `${apiUrl}?username=${username}&line=${line}&apikey=${apiKey}&mobile=${phone}&text=${text}`;
-      return fetch(url);
+      // const apiKey = this.configService.get('NOTIF_API_KEY');
+      // const { apiUrl, username, line } = notificationConstants;
+      // const url = `${apiUrl}?username=${username}&line=${line}&apikey=${apiKey}&mobile=${phone}&text=${text}`;
+      // return fetch(url);
+      this.logger.log('sent Sandbox Sms', phone, text);
     } catch (error) {
       this.logger.error('sendSandboxSms error', error);
     }

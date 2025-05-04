@@ -19,6 +19,7 @@ import { Model } from '../common/entities/model.entity';
 import { State } from '../common/entities/state.entity';
 import { User } from '../users/user.entity';
 import { MyLoggerService } from '../logger/logger.service';
+import { Listing } from '../listings/listing.entity';
 
 @Injectable()
 export class PreferencesService {
@@ -238,21 +239,45 @@ export class PreferencesService {
     return preference;
   }
 
-  async findMatchingPreferences(carListing: any): Promise<Preference[]> {
+  async findMatchingPreferences(carListing: Listing): Promise<Preference[]> {
     return this.preferenceRepository
       .createQueryBuilder('preference')
-      .where(
-        'preference.minPrice IS NULL OR :carPrice >= preference.minPrice',
-        {
-          carPrice: carListing.price,
-        },
+      .leftJoinAndSelect('preference.user', 'user')
+      .where('preference.state=:state', { state: carListing.state.id })
+      .andWhere('preference.city=:city', { city: carListing.city.id })
+      .andWhere('preference.make=:make', { make: carListing.make.id })
+      .andWhere('preference.model=:model', { model: carListing.model.id })
+      .andWhere(
+        'preference.minPrice IS NULL OR :price >= preference.minPrice',
+        { price: carListing.price },
       )
       .andWhere(
-        'preference.maxPrice IS NULL OR :carPrice <= preference.maxPrice',
-        {
-          carPrice: carListing.price,
-        },
+        'preference.maxPrice IS NULL OR :price <= preference.maxPrice',
+        { price: carListing.price },
       )
+      .andWhere('preference.minYear IS NULL OR :year >= preference.minYear', {
+        year: carListing.year,
+      })
+      .andWhere('preference.maxYear IS NULL OR :year <= preference.maxYear', {
+        year: carListing.year,
+      })
+      .andWhere(
+        'preference.minMileage IS NULL OR :mileage >= preference.minMileage',
+        { mileage: carListing.mileage },
+      )
+      .andWhere(
+        'preference.maxMileage IS NULL OR :mileage <= preference.maxMileage',
+        { mileage: carListing.mileage },
+      )
+      .andWhere(
+        'preference.minInsuranceDuration IS NULL OR :insuranceDuration >= preference.minInsuranceDuration',
+        { insuranceDuration: carListing.insuranceDuration },
+      )
+      .andWhere(
+        'preference.maxInsuranceDuration IS NULL OR :insuranceDuration <= preference.maxInsuranceDuration',
+        { insuranceDuration: carListing.insuranceDuration },
+      )
+      .select(['preference', 'user.phone'])
       .getMany();
   }
 

@@ -10,6 +10,6 @@ import { Preference } from './preference.entity';
   imports: [UsersModule, CommonModule, TypeOrmModule.forFeature([Preference])],
   providers: [PreferencesService],
   controllers: [PreferencesController],
-  exports: [TypeOrmModule],
+  exports: [PreferencesService, TypeOrmModule],
 })
 export class PreferencesModule {}
