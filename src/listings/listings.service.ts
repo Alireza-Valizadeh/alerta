@@ -138,17 +138,7 @@ export class ListingsService {
         continue;
       }
     }
-    for (const listing of listings) {
-      const matchingPrefs =
-        await this.preferencesService.findMatchingPreferences(listing);
-      this.logger.log('Matching prefs', matchingPrefs.length);
-      for (const pref of matchingPrefs) {
-        await this.notifService.sendSandboxSms(
-          pref.user.phone,
-          `Found a new car matching your alarm: ${listing.title}`,
-        );
-      }
-    }
+    await this.processListingsAndNotify(listings);
     return listings;
   }
 
@@ -391,5 +381,22 @@ export class ListingsService {
       }
     }
     return null;
+  }
+  private async processListingsAndNotify(listings: Listing[]) {
+    for (const listing of listings) {
+      const uniqueUsers = new Map<number, User>();
+      const phones: string[] = [];
+      const matchingPrefs =
+        await this.preferencesService.findMatchingPreferences(listing);
+      this.logger.log('Matching prefs', matchingPrefs.length);
+      for (const pref of matchingPrefs) {
+        if (pref.user && !uniqueUsers.has(pref.user.id)) {
+          uniqueUsers.set(pref.user.id, pref.user);
+          phones.push(pref.user.phone);
+        }
+      }
+      const msg = `Found a new car matching your alarm: ${listing.title}`;
+      await this.notifService.sendBulkSms(phones, msg);
+    }
   }
 }

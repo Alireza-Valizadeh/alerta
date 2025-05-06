@@ -9,6 +9,20 @@ export class NotificationsService {
     private readonly configService: ConfigService,
     private readonly logger: MyLoggerService,
   ) {}
+  async sendBulkSms(phones: string[], text: string) {
+    try {
+      // const apiKey = this.configService.get('NOTIF_API_KEY');
+      // const { apiUrl, username, line } = notificationConstants;
+      // const url = `${apiUrl}?username=${username}&line=${line}&apikey=${apiKey}&mobile=${phones.join(
+      //   ',',
+      // )}&text=${text}`;
+      // return fetch(url);
+      this.logger.log('sent Bulk Sms', phones, text);
+    } catch (error) {
+      this.logger.error('sendBulkSms error', error);
+    }
+  }
+
   async sendSandboxSms(phone: string, text: string) {
     try {
       // const apiKey = this.configService.get('NOTIF_API_KEY');

@@ -269,7 +269,7 @@ export class PreferencesService {
         { insuranceDuration: carListing.insuranceDuration },
       )
       .andWhere('color.id = :carColorId', { carColorId: carListing.color.id })
-      .andWhere('gearbox.id = :carGearboxId', {
+      .andWhere('gearbox.id =:carGearboxId', {
         carGearboxId: carListing.gearbox.id,
       })
       .andWhere('fuelType.id = :carFuelTypeId', {
@@ -284,8 +284,8 @@ export class PreferencesService {
       .andWhere('bodyState.id = :carBodyStateId', {
         carBodyStateId: carListing.bodyState.id,
       })
-      .select(['preference', 'user.phone'])
-      .groupBy('user.id');
+      .select(['preference', 'user.phone']);
+    // .groupBy('user.id');
 
     return queryBuilder.getMany();
   }
