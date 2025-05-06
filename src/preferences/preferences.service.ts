@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Preference } from './preference.entity';
-import { DataSource, In, Repository } from 'typeorm';
+import { In, Repository } from 'typeorm';
 import { CreatePreferenceDto, UpdatePreferenceDto } from './dto/preference.dto';
 import { BodyState } from '../common/entities/bodyState.entity';
 import { ChassisState } from '../common/entities/chassisState.entity';
@@ -50,7 +50,6 @@ export class PreferencesService {
     @InjectRepository(State)
     private statesRepository: Repository<State>,
     private logger: MyLoggerService,
-    private dataSource: DataSource,
   ) {
     this.relations = [
       'user',
@@ -240,45 +239,55 @@ export class PreferencesService {
   }
 
   async findMatchingPreferences(carListing: Listing): Promise<Preference[]> {
-    return this.preferenceRepository
+    const queryBuilder = this.preferenceRepository
       .createQueryBuilder('preference')
       .leftJoinAndSelect('preference.user', 'user')
-      .where('preference.state=:state', { state: carListing.state.id })
-      .andWhere('preference.city=:city', { city: carListing.city.id })
-      .andWhere('preference.make=:make', { make: carListing.make.id })
-      .andWhere('preference.model=:model', { model: carListing.model.id })
+      .leftJoin('preference.colors', 'color')
+      .leftJoin('preference.gearboxes', 'gearbox')
+      .leftJoin('preference.fuelTypes', 'fuelType')
+      .leftJoin('preference.engineStates', 'engineState')
+      .leftJoin('preference.chassisStates', 'chassisState')
+      .leftJoin('preference.bodyStates', 'bodyState')
+      .where('preference.stateId=:stateId', { stateId: carListing.state.id })
+      .andWhere('preference.cityId=:cityId', { cityId: carListing.city.id })
+      .andWhere('preference.makeId=:makeId', { makeId: carListing.make.id })
+      .andWhere('preference.modelId=:modelId', { modelId: carListing.model.id })
       .andWhere(
-        'preference.minPrice IS NULL OR :price >= preference.minPrice',
+        '(preference.minPrice IS NULL OR :price >= preference.minPrice) AND (preference.maxPrice IS NULL OR :price <= preference.maxPrice)',
         { price: carListing.price },
       )
       .andWhere(
-        'preference.maxPrice IS NULL OR :price <= preference.maxPrice',
-        { price: carListing.price },
+        '(preference.minYear IS NULL OR :year >= preference.minYear) AND (preference.maxYear IS NULL OR :year <= preference.maxYear)',
+        { year: carListing.year },
       )
-      .andWhere('preference.minYear IS NULL OR :year >= preference.minYear', {
-        year: carListing.year,
-      })
-      .andWhere('preference.maxYear IS NULL OR :year <= preference.maxYear', {
-        year: carListing.year,
-      })
       .andWhere(
-        'preference.minMileage IS NULL OR :mileage >= preference.minMileage',
+        '(preference.minMileage IS NULL OR :mileage >= preference.minMileage) AND (preference.maxMileage IS NULL OR :mileage <= preference.maxMileage)',
         { mileage: carListing.mileage },
       )
       .andWhere(
-        'preference.maxMileage IS NULL OR :mileage <= preference.maxMileage',
-        { mileage: carListing.mileage },
-      )
-      .andWhere(
-        'preference.minInsuranceDuration IS NULL OR :insuranceDuration >= preference.minInsuranceDuration',
+        '(preference.minInsuranceDuration IS NULL OR :insuranceDuration >= preference.minInsuranceDuration) AND (preference.maxInsuranceDuration IS NULL OR :insuranceDuration <= preference.maxInsuranceDuration)',
         { insuranceDuration: carListing.insuranceDuration },
       )
-      .andWhere(
-        'preference.maxInsuranceDuration IS NULL OR :insuranceDuration <= preference.maxInsuranceDuration',
-        { insuranceDuration: carListing.insuranceDuration },
-      )
+      .andWhere('color.id = :carColorId', { carColorId: carListing.color.id })
+      .andWhere('gearbox.id = :carGearboxId', {
+        carGearboxId: carListing.gearbox.id,
+      })
+      .andWhere('fuelType.id = :carFuelTypeId', {
+        carFuelTypeId: carListing.fuelType.id,
+      })
+      .andWhere('engineState.id = :carEngineStateId', {
+        carEngineStateId: carListing.engineState.id,
+      })
+      .andWhere('chassisState.id = :carChassisStateId', {
+        carChassisStateId: carListing.chassisState.id,
+      })
+      .andWhere('bodyState.id = :carBodyStateId', {
+        carBodyStateId: carListing.bodyState.id,
+      })
       .select(['preference', 'user.phone'])
-      .getMany();
+      .groupBy('user.id');
+
+    return queryBuilder.getMany();
   }
 
   private async findEntitiesByIds<T>(

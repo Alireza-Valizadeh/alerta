@@ -141,6 +141,7 @@ export class ListingsService {
     for (const listing of listings) {
       const matchingPrefs =
         await this.preferencesService.findMatchingPreferences(listing);
+      this.logger.log('Matching prefs', matchingPrefs.length);
       for (const pref of matchingPrefs) {
         await this.notifService.sendSandboxSms(
           pref.user.phone,
@@ -219,37 +220,37 @@ export class ListingsService {
       this.gearboxesRepository,
       info.details.transmission,
       PersianTranslations.Gearboxes,
-      'gearbox',
+      // 'gearbox',
     );
     const bodyState = await this.findLookupEntityByTitle(
       this.bodyStatesRepository,
       info.details.bodyState,
       PersianTranslations.BodyStates,
-      'body state',
+      // 'body state',
     );
     const chassisState = await this.findLookupEntityByTitle(
       this.chassisStatesRepository,
       info.details.chassisState,
       PersianTranslations.ChassisStates,
-      'chassis state',
+      // 'chassis state',
     );
     const color = await this.findLookupEntityByTitle(
       this.colorsRepository,
       info.details.color,
       PersianTranslations.Colors,
-      'color',
+      // 'color',
     );
     const engineState = await this.findLookupEntityByTitle(
       this.engineStatesRepository,
       info.details.engineState,
       PersianTranslations.EngineStates,
-      'engine state',
+      // 'engine state',
     );
     const fuelType = await this.findLookupEntityByTitle(
       this.fuelTypesRepository,
       info.details.fuelType,
       PersianTranslations.FuelTypes,
-      'fuel type',
+      // 'fuel type',
     );
     const make = await this.makesRepository.findOneBy({
       title: info.details.make,
@@ -270,7 +271,7 @@ export class ListingsService {
     });
     const dto: Required<CreateListingDto> = {
       title: info.title,
-      description: info.details.description.slice(0, 497).concat('...'),
+      description: info.details?.description?.slice(0, 497).concat('...') || '',
       link: info.vdpUrl,
       mileage: this.parseMileageToNumber(info.mileage),
       price: this.parsePriceToNumber(info.price),
@@ -373,11 +374,11 @@ export class ListingsService {
     repository: Repository<T>,
     title: string | null,
     translations: Record<string, string>,
-    entityName: string,
+    // entityName: string,
   ): Promise<T | null> {
     const defaultTitle = translations?.Undefined;
     const searchTerm = title || defaultTitle;
-    this.logger.log(`Searching for ${entityName}: ${searchTerm}`);
+    // this.logger.log(`Searching for ${entityName}: ${searchTerm}`);
 
     let entity = await repository.findOneBy({ title: searchTerm } as any);
     if (entity) return entity;
