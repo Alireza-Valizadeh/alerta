@@ -395,8 +395,8 @@ export class ListingsService {
           phones.push(pref.user.phone);
         }
       }
-      const msg = `یک دستگاه ${listing.model.title} جدید مطابق با شرایط شما آگهی شد.`;
-      // ${listing.link}`;
+      const msg = `یک دستگاه ${listing.model.title} جدید مطابق با شرایط شما آگهی شد:
+      ${listing.link}`;
       if (phones.length > 0) {
         await this.notifService.sendBulkSms(phones, msg);
         // this.logger.log(msg);
