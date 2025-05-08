@@ -17,21 +17,21 @@ export class NotificationsService {
       const { apiUrl, bulkSubUrl, lineNumber } = notificationConstants;
       this.logger.log('apiKey', apiKey);
       const bulkUrl = apiUrl + bulkSubUrl;
-      const response = await axios.post(
-        bulkUrl,
-        {
-          lineNumber,
-          MessageText: text,
-          Mobiles: phones,
-        },
-        {
-          headers: {
-            'x-api-key': apiKey,
-            'Content-Type': 'application/json',
-          },
-        },
-      );
-      this.logger.log({ response: response.data });
+      // const response = await axios.post(
+      //   bulkUrl,
+      //   {
+      //     lineNumber,
+      //     MessageText: text,
+      //     Mobiles: phones,
+      //   },
+      //   {
+      //     headers: {
+      //       'x-api-key': apiKey,
+      //       'Content-Type': 'application/json',
+      //     },
+      //   },
+      // );
+      // this.logger.log({ response: response.data });
       this.logger.log('sent Bulk Sms', phones, text);
     } catch (error) {
       this.logger.error('sendBulkSms error', error);
