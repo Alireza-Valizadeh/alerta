@@ -389,17 +389,17 @@ export class ListingsService {
       const matchingPrefs =
         await this.preferencesService.findMatchingPreferences(listing);
       this.logger.log('Matching prefs', matchingPrefs.length);
+      this.logger.log('Matching prefs', matchingPrefs);
       for (const pref of matchingPrefs) {
         if (pref.user && !uniqueUsers.has(pref.user.id)) {
           uniqueUsers.set(pref.user.id, pref.user);
           phones.push(pref.user.phone);
         }
       }
-      const msg = `یک دستگاه ${listing.model.title} جدید مطابق با شرایط شما آگهی شد:
+      const msg = `آگهی جدید: ${listing.model.title} مدل ${listing.year}
       ${listing.link}`;
       if (phones.length > 0) {
         await this.notifService.sendBulkSms(phones, msg);
-        // this.logger.log(msg);
       }
     }
   }

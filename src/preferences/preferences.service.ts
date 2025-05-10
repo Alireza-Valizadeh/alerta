@@ -269,48 +269,48 @@ export class PreferencesService {
         { insuranceDuration: carListing.insuranceDuration },
       )
       .andWhere(
-        `color.id IN (:...colorIds) OR NOT EXISTS (
-          SELECT 1 FROM preference_colors pc
-          WHERE pc.preferenceId = preference.id
-        )`,
+        `(color.id IN (:...colorIds) OR NOT EXISTS (
+          SELECT 1 FROM "preference_colors" pc
+          WHERE pc."preferenceId" = preference.id
+        ))`,
         { colorIds: [carListing.color.id] },
       )
       .andWhere(
-        `gearbox.id IN (:...gearboxIds) OR NOT EXISTS (
-          SELECT 1 FROM preference_gearboxes pg
-          WHERE pg.preferenceId = preference.id
-        )`,
+        `(gearbox.id IN (:...gearboxIds) OR NOT EXISTS (
+          SELECT 1 FROM "preference_gearboxes" pg
+          WHERE pg."preferenceId" = preference.id
+      ))`,
         { gearboxIds: [carListing.gearbox.id] },
       )
       .andWhere(
-        `fuelType.id IN (:...fuelTypeIds) OR NOT EXISTS (
-          SELECT 1 FROM preference_fuelTypes pft
-          WHERE pft.preferenceId = preference.id
-        )`,
+        `(fuelType.id IN (:...fuelTypeIds) OR NOT EXISTS (
+          SELECT 1 FROM "preference_fuelTypes" pft
+          WHERE pft."preferenceId" = preference.id
+      ))`,
         { fuelTypeIds: [carListing.fuelType.id] },
       )
       .andWhere(
-        `engineState.id IN (:...engineStateIds) OR NOT EXISTS (
-          SELECT 1 FROM preference_engineStates pes
-          WHERE pes.preferenceId = preference.id
-        )`,
+        `(engineState.id IN (:...engineStateIds) OR NOT EXISTS (
+          SELECT 1 FROM "preference_engineStates" pes
+          WHERE pes."preferenceId" = preference.id
+      ))`,
         { engineStateIds: [carListing.engineState.id] },
       )
       .andWhere(
-        `chassisState.id IN (:...chassisStateIds) OR NOT EXISTS (
-          SELECT 1 FROM preference_chassisStates pchs
-          WHERE pchs.preferenceId = preference.id
-        )`,
+        `(chassisState.id IN (:...chassisStateIds) OR NOT EXISTS (
+          SELECT 1 FROM "preference_chassisStates" pchs
+          WHERE pchs."preferenceId" = preference.id
+      ))`,
         { chassisStateIds: [carListing.chassisState.id] },
       )
       .andWhere(
-        `bodyState.id IN (:...bodyStateIds) OR NOT EXISTS (
-          SELECT 1 FROM preference_bodyStates pbs
-          WHERE pbs.preferenceId = preference.id
-        )`,
+        `(bodyState.id IN (:...bodyStateIds) OR NOT EXISTS (
+          SELECT 1 FROM "preference_bodyStates" pbs
+          WHERE pbs."preferenceId" = preference.id
+      ))`,
         { bodyStateIds: [carListing.bodyState.id] },
       )
-      .select(['preference', 'user.phone']);
+      .select(['preference', 'user.phone', 'user.id']);
     // .groupBy('user.id');
 
     return queryBuilder.getMany();
