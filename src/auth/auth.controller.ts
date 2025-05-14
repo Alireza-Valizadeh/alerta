@@ -30,11 +30,9 @@ export class AuthController {
 
   @Post('login')
   @UsePipes(new ZodValidationPipe(registerUserV2Schema))
-  async loginByCode(
-    @Body() loginDto: RegisterUserV2Dto,
-  ): Promise<{ code: string }> {
-    const code = await this.authService.loginByCode(loginDto);
-    return { code };
+  async loginByCode(@Body() loginDto: RegisterUserV2Dto): Promise<boolean> {
+    await this.authService.loginByCode(loginDto);
+    return true;
   }
 
   @Post('login/validate')
