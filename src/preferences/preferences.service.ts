@@ -18,7 +18,7 @@ import { Make } from '../common/entities/make.entity';
 import { Model } from '../common/entities/model.entity';
 import { State } from '../common/entities/state.entity';
 import { User } from '../users/user.entity';
-import { MyLoggerService } from '../logger/logger.service';
+import { MyLoggerService } from '../core/logger.service';
 import { Listing } from '../listings/listing.entity';
 
 @Injectable()

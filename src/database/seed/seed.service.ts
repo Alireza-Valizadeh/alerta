@@ -12,7 +12,7 @@ import { Make } from '../../common/entities/make.entity';
 import { Model } from '../../common/entities/model.entity';
 import { State } from '../../common/entities/state.entity';
 import { Repository } from 'typeorm';
-import { MyLoggerService } from '../../logger/logger.service';
+import { MyLoggerService } from '../../core/logger.service';
 import { PersianTranslations } from '../../common/enums/translations.enum';
 import * as IranStates from './provinces.json';
 import * as IranCities from './cities.json';

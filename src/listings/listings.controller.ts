@@ -18,7 +18,7 @@ import { ListingsService } from './listings.service';
 import { ZodValidationPipe } from '../pipes/zod-validation.pipe';
 import { Listing } from './listing.entity';
 import { createListingFromDivarDto } from './dto/create-listing-from-divar.dto';
-import { MyLoggerService } from '../logger/logger.service';
+import { MyLoggerService } from '../core/logger.service';
 
 @Controller('listings')
 export class ListingsController {

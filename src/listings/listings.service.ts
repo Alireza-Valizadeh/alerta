@@ -15,7 +15,7 @@ import { Model } from '../common/entities/model.entity';
 import { State } from '../common/entities/state.entity';
 import { User } from '../users/user.entity';
 import { createListingFromDivarDto } from './dto/create-listing-from-divar.dto';
-import { MyLoggerService } from '../logger/logger.service';
+import { MyLoggerService } from '../core/logger.service';
 import { PersianTranslations } from '../common/enums/translations.enum';
 import { NotificationsService } from '../notifications/notifications.service';
 import { PreferencesService } from '../preferences/preferences.service';

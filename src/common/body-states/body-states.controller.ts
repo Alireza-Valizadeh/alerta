@@ -8,7 +8,7 @@ import {
   Put,
 } from '@nestjs/common';
 import { BodyStatesService } from './body-states.service';
-import { MyLoggerService } from '../../logger/logger.service';
+import { MyLoggerService } from '../../core/logger.service';
 import { BodyState } from '../entities/bodyState.entity';
 
 @Controller('body-states')

@@ -1,4 +1,11 @@
 services:
+  redis:
+    image: redis:7-alpine # Use a specific version
+    container_name: redis
+    ports:
+      - '6379:6379'
+    volumes:
+      - redis_data:/data # Persist data
   db:
     image: postgres:14-alpine # Use a specific version for stability
     container_name: postgres_db
@@ -24,9 +31,10 @@ services:
       DB_PASSWORD: 139142625
       DB_NAME: shekarchi
     volumes:
-        - ./src:/usr/src/app/src
+      - ./src:/usr/src/app/src
     depends_on:
       - db # Ensure the database starts before the app
     command: npm run start:dev
 volumes:
   db_data:
+  redis_data:

@@ -9,7 +9,7 @@ import {
 } from '@nestjs/common';
 import { Gearbox } from '../entities/gearbox.entity';
 import { GearboxesService } from './gearboxes.service';
-import { MyLoggerService } from '../../logger/logger.service';
+import { MyLoggerService } from '../../core/logger.service';
 
 @Controller('gearboxes')
 export class GearboxesController {

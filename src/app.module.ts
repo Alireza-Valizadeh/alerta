@@ -6,12 +6,13 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { UsersModule } from './users/users.module';
 import { AuthModule } from './auth/auth.module';
 import { LoggerMiddleware } from './middlewares/logger.middleware';
-import { MyLoggerModule } from './logger/logger.module';
 import { PreferencesModule } from './preferences/preferences.module';
 import { ListingsModule } from './listings/listings.module';
 import { NotificationsModule } from './notifications/notifications.module';
 import { CommonModule } from './common/common.module';
 import { DatabaseModule } from './database/database.module';
+import { RedisService } from './core/redis.service';
+import { CoreModule } from './core/core.module';
 
 @Module({
   imports: [
@@ -20,7 +21,7 @@ import { DatabaseModule } from './database/database.module';
       envFilePath: '.env',
     }),
     TypeOrmModule.forRootAsync({
-      imports: [ConfigModule, MyLoggerModule],
+      imports: [ConfigModule],
       useFactory: (configService: ConfigService) => ({
         type: 'postgres',
         host: configService.get('DB_HOST'),
@@ -41,9 +42,10 @@ import { DatabaseModule } from './database/database.module';
     NotificationsModule,
     CommonModule,
     DatabaseModule,
+    CoreModule,
   ],
   controllers: [AppController],
-  providers: [AppService],
+  providers: [AppService, RedisService],
 })
 export class AppModule implements NestModule {
   configure(consumer: MiddlewareConsumer) {

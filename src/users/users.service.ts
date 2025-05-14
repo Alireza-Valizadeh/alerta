@@ -9,7 +9,7 @@ import { Repository, UpdateResult } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { userConstants } from './constants';
 import { UserMessages } from './enums/user-messages.enum';
-import { MyLoggerService } from '../logger/logger.service';
+import { MyLoggerService } from '../core/logger.service';
 import { RegisterUserDto } from './dto/register-user.dto';
 import { Gender } from './enums/genders.enum';
 import { RegisterUserV2Dto } from './dto/register-user-v2-dto';
