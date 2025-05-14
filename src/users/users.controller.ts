@@ -16,7 +16,11 @@ import { UsersService } from './users.service';
 import { User } from './user.entity';
 import { AuthGuard } from '../auth/auth.guard';
 import { ZodValidationPipe } from '../pipes/zod-validation.pipe';
-import { registerUserSchema } from './dto/register-user.dto';
+import { RegisterUserDto, registerUserSchema } from './dto/register-user.dto';
+import {
+  RegisterUserV2Dto,
+  registerUserV2Schema,
+} from './dto/register-user-v2-dto';
 
 @Controller({
   path: 'users',
@@ -44,13 +48,22 @@ export class UsersController {
   }
   @Post('register')
   @UsePipes(new ZodValidationPipe(registerUserSchema))
-  createUser(@Body() user: Omit<User, 'id'>) {
+  createUser(@Body() user: RegisterUserDto) {
     return this.usersService.register(user);
   }
+
+  @Version('2')
+  @Post('register')
+  @UsePipes(new ZodValidationPipe(registerUserV2Schema))
+  createUserV2(@Body() user: RegisterUserV2Dto) {
+    return this.usersService.registerV2(user);
+  }
+
   @Put(':id')
   updateUser(@Param('id') id: number, @Body() user: Partial<User>) {
     return this.usersService.update(id, user);
   }
+
   @Delete(':id')
   deleteUser(@Param('id') id: number) {
     return this.usersService.delete(id);

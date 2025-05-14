@@ -12,11 +12,14 @@ export const genderSchema = z.enum([
 export const registerUserSchema = z.object({
   firstName: z.string().min(2).max(50).optional(),
   lastName: z.string().min(2).max(50).optional(),
-  email: z.string().email(),
-  password: z.string().min(6),
-  phone: z.string().optional(),
-  gender: genderSchema.optional(),
   isAbandoned: z.boolean().optional().default(false),
+  gender: genderSchema.optional(),
+
+  email: z.string().email().optional(),
+  password: z.string().min(6).optional(),
+  confirmPassword: z.string().min(6).optional(),
+
+  phone: z.string(),
 });
 
 export type RegisterUserDto = z.infer<typeof registerUserSchema>;

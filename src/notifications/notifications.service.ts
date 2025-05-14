@@ -6,13 +6,15 @@ import { MyLoggerService } from '../logger/logger.service';
 
 @Injectable()
 export class NotificationsService {
+  private API_KEY: string;
   constructor(
     private readonly configService: ConfigService,
     private readonly logger: MyLoggerService,
-  ) {}
+  ) {
+    this.API_KEY = this.configService.get('NOTIF_API_KEY');
+  }
   async sendBulkSms(phones: string[], text: string) {
     try {
-      const apiKey = this.configService.get(`NOTIF_API_KEY`);
       const { apiUrl, bulkSubUrl, lineNumber } = notificationConstants;
       const bulkUrl = apiUrl + bulkSubUrl;
       const response = await axios.post(
@@ -24,7 +26,7 @@ export class NotificationsService {
         },
         {
           headers: {
-            'x-api-key': apiKey,
+            'x-api-key': this.API_KEY,
             'Content-Type': 'application/json',
           },
         },
@@ -36,13 +38,20 @@ export class NotificationsService {
     }
   }
 
-  async sendSandboxSms(phone: string, text: string) {
+  async sendVertificationCode(phone: string, code: string) {
     try {
-      // const apiKey = this.configService.get('NOTIF_API_KEY');
-      // const { apiUrl, username, line } = notificationConstants;
-      // const url = `${apiUrl}?username=${username}&line=${line}&apikey=${apiKey}&mobile=${phone}&text=${text}`;
-      // return fetch(url);
-      this.logger.log('sent Sandbox Sms', phone, text);
+      const { apiUrl, username, lineNumber } = notificationConstants;
+      const text = `کد ورود به سامانه (محرمانه)
+           code: ${code}`;
+      const qs = `Username=${username}&Line=${lineNumber}&Text=${text}&Mobile=${phone}&Password=${this.API_KEY}`;
+      const response = await axios.get(apiUrl + '?' + qs, {
+        headers: {
+          'x-api-key': this.API_KEY,
+          'Content-Type': 'application/json',
+        },
+      });
+      this.logger.log({ response: response.data });
+      this.logger.log('sent Vertification Code', phone, code);
     } catch (error) {
       this.logger.error('sendSandboxSms error', error);
     }

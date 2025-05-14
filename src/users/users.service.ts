@@ -10,6 +10,9 @@ import * as bcrypt from 'bcrypt';
 import { userConstants } from './constants';
 import { UserMessages } from './enums/user-messages.enum';
 import { MyLoggerService } from '../logger/logger.service';
+import { RegisterUserDto } from './dto/register-user.dto';
+import { Gender } from './enums/genders.enum';
+import { RegisterUserV2Dto } from './dto/register-user-v2-dto';
 @Injectable()
 export class UsersService {
   constructor(
@@ -17,27 +20,50 @@ export class UsersService {
     private usersRepository: Repository<User>,
     private readonly logger: MyLoggerService,
   ) {}
-  async register(user: Omit<User, 'id'>): Promise<Omit<User, 'password'>> {
+
+  async register(userDto: RegisterUserDto): Promise<Omit<User, 'password'>> {
+    if (userDto.password !== userDto.confirmPassword) {
+      throw new ConflictException(UserMessages.PasswordMismatch);
+    }
     const existingUser = await this.usersRepository.findOneBy({
-      email: user.email,
+      email: userDto.email,
     });
     if (existingUser) {
-      this.logger.log('New user tried an existing email', user.email);
+      this.logger.log('New user tried an existing email', userDto.email);
       throw new ConflictException(UserMessages.Duplicate);
     }
     const hashedPassword = await bcrypt.hash(
-      user.password,
+      userDto.password,
       userConstants.saltRounds,
     );
-    user.password = hashedPassword;
+    userDto.password = hashedPassword;
+    const user = this.usersRepository.create({
+      ...userDto,
+      gender: userDto.gender as Gender,
+    });
     const registeredUser = await this.usersRepository.save(user);
     Reflect.deleteProperty(registeredUser, 'password');
     this.logger.log('New user registered', registeredUser);
     return registeredUser;
   }
+
+  async registerV2(userDto: RegisterUserV2Dto): Promise<User> {
+    const existingUser = await this.findOneByPhone(userDto.phone);
+    if (existingUser) {
+      this.logger.log('New user tried an existing phone number', userDto.phone);
+      throw new ConflictException(UserMessages.Duplicate);
+    }
+    const user = this.usersRepository.create({
+      phone: userDto.phone,
+    });
+    await this.usersRepository.save(userDto);
+    return user;
+  }
+
   update(id: number, user: Partial<User>): Promise<UpdateResult> {
     return this.usersRepository.update(id, user);
   }
+
   async findOneById(id: number): Promise<User> {
     const user = await this.usersRepository.findOneBy({ id });
     if (!user) {
@@ -52,6 +78,12 @@ export class UsersService {
     }
     return user;
   }
+
+  async findOneByPhone(phone: string): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ phone });
+    return user;
+  }
+
   async delete(id: number): Promise<void> {
     await this.usersRepository.delete(id);
   }

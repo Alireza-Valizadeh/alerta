@@ -14,7 +14,7 @@ export class User {
   @Column({ type: 'varchar', length: 50, nullable: true })
   lastName: string;
 
-  @Column({ type: 'varchar', unique: true })
+  @Column({ type: 'varchar', unique: true, nullable: true })
   email: string;
 
   @Column({ type: 'enum', enum: Gender, default: Gender.NOT_SPECIFIED })
@@ -23,10 +23,10 @@ export class User {
   @Column({ type: 'boolean', default: false })
   isAbandoned: boolean;
 
-  @Column({ type: 'varchar', nullable: true })
+  @Column({ type: 'varchar', unique: true })
   phone: string;
 
-  @Column({ type: 'varchar' })
+  @Column({ type: 'varchar', nullable: true })
   password: string;
 
   @OneToMany(() => Listing, (listing) => listing.user)
