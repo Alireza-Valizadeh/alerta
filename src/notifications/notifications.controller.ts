@@ -8,7 +8,7 @@ export class NotificationsController {
   test() {
     return this.notificationsService.sendVertificationCode(
       '09151244265',
-      '1234',
+      '2667',
     );
   }
 }

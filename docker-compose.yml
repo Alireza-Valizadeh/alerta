@@ -1,6 +1,6 @@
 services:
   redis:
-    image: redis:7-alpine # Use a specific version
+    image: redis:7.4-alpine # Use a specific version
     container_name: redis
     ports:
       - '6379:6379'

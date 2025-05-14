@@ -23,8 +23,7 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
   }
 
   async onModuleInit() {
-    this.logger.log('REDIS_HOST');
-    // await this.client.connect();
+    await this.client.connect();
   }
 
   async onModuleDestroy() {
