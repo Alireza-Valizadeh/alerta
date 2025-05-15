@@ -1,4 +1,3 @@
-import { customAlphabet } from 'nanoid';
 import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { UsersService } from '../users/users.service';
@@ -37,7 +36,7 @@ export class AuthService {
     if (!user) {
       user = await this.usersService.registerV2(userDto);
     }
-    const code = this.generate2faCode();
+    const code = await this.generate2faCode();
     this.logger.log('code generated', { phone: user.phone, code });
     this.redisService.set(`2fa-${user.phone}`, code, 60);
     // this.notifService.sendVertificationCode(user.phone, code);
@@ -59,7 +58,8 @@ export class AuthService {
     return token;
   }
 
-  private generate2faCode(): string {
+  private async generate2faCode(): Promise<string> {
+    const { customAlphabet } = await import('nanoid');
     const generator = customAlphabet('123456789', 4);
     return generator(4);
   }
