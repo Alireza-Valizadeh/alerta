@@ -7,6 +7,7 @@ import { RegisterUserV2Dto } from '../users/dto/register-user-v2-dto';
 import { User } from '../users/user.entity';
 import { RedisService } from '../core/redis.service';
 import { NotificationsService } from '../notifications/notifications.service';
+import { Messages } from './constants';
 
 @Injectable()
 export class AuthService {
@@ -45,14 +46,14 @@ export class AuthService {
   async validateLoginCode(phone: string, code: string): Promise<string> {
     const user = await this.usersService.findOneByPhone(phone);
     if (!user) {
-      throw new UnauthorizedException('Invalid phone number!');
+      throw new UnauthorizedException(Messages.PHONE_NOT_FOUND);
     }
     const storedCode = await this.redisService.get(`2fa-${user.phone}`);
     if (!storedCode) {
-      throw new UnauthorizedException('This code has expired!');
+      throw new UnauthorizedException(Messages.CODE_EXPIRED);
     }
     if (storedCode !== code) {
-      throw new UnauthorizedException('Invalid code!');
+      throw new UnauthorizedException(Messages.INVALID_CODE);
     }
     const token = this.generateAccessToken(user);
     return token;
