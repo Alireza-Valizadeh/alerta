@@ -8,7 +8,7 @@
   "scripts": {
     "build": "nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
-    "start": "npm run start:runflare",
+    "start": "node dist/main",
     "start:dev": "nodemon -r tsconfig-paths/register --legacy-watch src/**/*.ts",
     "start:debug": "nest start --debug --watch",
     "start:prod": "node dist/main",
