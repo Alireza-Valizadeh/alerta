@@ -40,17 +40,19 @@ export class NotificationsService {
 
   async sendVertificationCode(phone: string, code: string) {
     try {
-      const { apiUrl, username, lineNumber } = notificationConstants;
-      const text = `کد ورود به سامانه (محرمانه)
+      if (this.configService.get('NODE_ENV') === 'production') {
+        const { apiUrl, username, lineNumber } = notificationConstants;
+        const text = `کد ورود به سامانه (محرمانه)
            code: ${code}`;
-      const qs = `Username=${username}&Line=${lineNumber}&Text=${text}&Mobile=${phone}&Password=${this.API_KEY}`;
-      const response = await axios.get(apiUrl + '?' + qs, {
-        headers: {
-          'x-api-key': this.API_KEY,
-          'Content-Type': 'application/json',
-        },
-      });
-      this.logger.log({ response: response.data });
+        const qs = `Username=${username}&Line=${lineNumber}&Text=${text}&Mobile=${phone}&Password=${this.API_KEY}`;
+        const response = await axios.get(apiUrl + '?' + qs, {
+          headers: {
+            'x-api-key': this.API_KEY,
+            'Content-Type': 'application/json',
+          },
+        });
+        this.logger.log({ response: response.data });
+      }
       this.logger.log('sent Vertification Code', phone, code);
     } catch (error) {
       this.logger.error('sendSandboxSms error', error);

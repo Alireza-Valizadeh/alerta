@@ -41,7 +41,7 @@ export class AuthService {
     const code = await this.generate2faCode();
     this.logger.log('code generated', { phone: user.phone, code });
     this.redisService.set(`2fa-${user.phone}`, code, 60);
-    // this.notifService.sendVertificationCode(user.phone, code);
+    this.notifService.sendVertificationCode(user.phone, code);
   }
 
   async validateLoginCode(phone: string, code: string): Promise<string> {
