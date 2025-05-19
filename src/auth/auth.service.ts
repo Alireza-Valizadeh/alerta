@@ -8,6 +8,7 @@ import { User } from '../users/user.entity';
 import { RedisService } from '../core/redis.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { Messages } from './constants';
+import { customAlphabet } from 'nanoid';
 
 @Injectable()
 export class AuthService {
@@ -60,7 +61,6 @@ export class AuthService {
   }
 
   private async generate2faCode(): Promise<string> {
-    const { customAlphabet } = await import('nanoid');
     const generator = customAlphabet('123456789', 4);
     return generator(4);
   }
