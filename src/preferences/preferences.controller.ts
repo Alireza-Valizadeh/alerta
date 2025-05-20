@@ -28,13 +28,17 @@ import { AuthGuard } from '../auth/auth.guard';
 export class PreferencesController {
   constructor(private preferencesService: PreferencesService) {}
   @Get()
-  getAll() {
-    return this.preferencesService.findAll();
+  @UseGuards(AuthGuard)
+  getAll(@Request() request): Promise<Preference[]> {
+    const uid = request.user.sub;
+    return this.preferencesService.findAll(uid);
   }
+
   @Get(':id')
   getOne(@Param('id', ParseIntPipe) id: number) {
     return this.preferencesService.findOne(id);
   }
+
   @Post()
   @UseGuards(AuthGuard)
   @UsePipes(new ZodValidationPipe(createPreferenceSchema))

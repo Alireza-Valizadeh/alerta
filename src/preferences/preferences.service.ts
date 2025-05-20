@@ -128,9 +128,10 @@ export class PreferencesService {
     return this.preferenceRepository.save(preference);
   }
 
-  async findAll(): Promise<Preference[]> {
+  async findAll(uid: number): Promise<Preference[]> {
     return this.preferenceRepository.find({
       relations: this.relations,
+      where: { user: { id: uid } },
     });
   }
 
