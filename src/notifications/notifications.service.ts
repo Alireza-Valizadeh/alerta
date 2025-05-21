@@ -41,11 +41,14 @@ export class NotificationsService {
   async sendVertificationCode(phone: string, code: string) {
     try {
       if (this.configService.get('NODE_ENV') === 'production') {
-        const { apiUrl, username, lineNumber } = notificationConstants;
-        const text = `کد ورود به سامانه (محرمانه)
-           code: ${code}`;
-        const qs = `Username=${username}&Line=${lineNumber}&Text=${text}&Mobile=${phone}&Password=${this.API_KEY}`;
-        const response = await axios.get(apiUrl + '?' + qs, {
+        const { apiUrl, verifySubUrl, templateId } = notificationConstants;
+        const verifyUrl = apiUrl + verifySubUrl;
+        const body = {
+          Mobile: phone,
+          TemplateId: templateId,
+          Parameters: [{ name: 'code', value: code }],
+        };
+        const response = await axios.post(verifyUrl, body, {
           headers: {
             'x-api-key': this.API_KEY,
             'Content-Type': 'application/json',
