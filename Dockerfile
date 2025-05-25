@@ -1,23 +1,30 @@
-# Use an official Node.js runtime as a parent image
-FROM node:20.19.0-alpine3.20
+# --------- STAGE 1: Build ---------
+FROM node:20.19.0-alpine3.20 AS builder
 
-# Set the working directory in the container
 WORKDIR /usr/src/app
 
-# Copy package.json and package-lock.json to the working directory
+# Install build dependencies
 COPY package*.json ./
-
-# Install dependencies
 RUN npm install
 
-# Copy the source code from your machine to the container
+# Copy source files
 COPY . .
 
-# Build the Nest.js application
-RUN npm run build
+# Build the app using local CLI via npx
+RUN npx nest build
 
-# Expose the port your application listens on
+# --------- STAGE 2: Production ---------
+FROM node:20.19.0-alpine3.20
+
+WORKDIR /usr/src/app
+
+# Only copy the built app and necessary files
+COPY --from=builder /usr/src/app/package*.json ./
+COPY --from=builder /usr/src/app/node_modules ./node_modules
+COPY --from=builder /usr/src/app/dist ./dist
+
+# Expose app port
 EXPOSE 3000
 
-# Command to run the application
-CMD [ "npm", "run", "start" ]
+# Run the app
+CMD ["node", "dist/main"]
