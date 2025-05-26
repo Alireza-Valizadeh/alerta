@@ -311,7 +311,7 @@ export class PreferencesService {
       ))`,
         { bodyStateIds: [carListing.bodyState.id] },
       )
-      .select(['preference', 'user.phone', 'user.id']);
+      .select(['preference', 'user']);
     // .groupBy('user.id');
 
     return queryBuilder.getMany();

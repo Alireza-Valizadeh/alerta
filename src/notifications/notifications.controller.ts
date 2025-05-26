@@ -1,14 +1,14 @@
-import { Controller, Get } from '@nestjs/common';
+import { Controller, Get, Request, UseGuards } from '@nestjs/common';
 import { NotificationsService } from './notifications.service';
+import { AuthGuard } from '../auth/auth.guard';
 
 @Controller('notifications')
 export class NotificationsController {
   constructor(private notificationsService: NotificationsService) {}
-  @Get('test')
-  test() {
-    return this.notificationsService.sendVertificationCode(
-      '09151244265',
-      '2667',
-    );
+  @Get()
+  @UseGuards(AuthGuard)
+  getUserNotifications(@Request() request) {
+    const uid = request.user.sub;
+    return this.notificationsService.findUserNotifications(uid);
   }
 }

@@ -384,6 +384,8 @@ export class ListingsService {
   }
   private async processListingsAndNotify(listings: Listing[]) {
     for (const listing of listings) {
+      const msg = `آگهی جدید: ${listing.model.title} مدل ${listing.year}
+      ${listing.link}`;
       const uniqueUsers = new Map<number, User>();
       const phones: string[] = [];
       const matchingPrefs =
@@ -394,12 +396,12 @@ export class ListingsService {
         if (pref.user && !uniqueUsers.has(pref.user.id)) {
           uniqueUsers.set(pref.user.id, pref.user);
           phones.push(pref.user.phone);
+          await this.notifService.sendAndSaveNotificationSms(
+            pref,
+            listing,
+            msg,
+          );
         }
-      }
-      const msg = `آگهی جدید: ${listing.model.title} مدل ${listing.year}
-      ${listing.link}`;
-      if (phones.length > 0) {
-        await this.notifService.sendBulkSms(phones, msg);
       }
     }
   }

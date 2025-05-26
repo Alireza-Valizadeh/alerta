@@ -1,3 +1,4 @@
+import { Notification } from '../notifications/notification.entity';
 import { BodyState } from '../common/entities/bodyState.entity';
 import { ChassisState } from '../common/entities/chassisState.entity';
 import { City } from '../common/entities/city.entity';
@@ -16,6 +17,7 @@ import {
   JoinColumn,
   ManyToMany,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 
@@ -87,4 +89,7 @@ export class Preference {
 
   @DeleteDateColumn({ type: 'timestamp' })
   deletedAt: Date;
+
+  @OneToMany(() => Notification, (notification) => notification.preference)
+  notifications: Notification[];
 }

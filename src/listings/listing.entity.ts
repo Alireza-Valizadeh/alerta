@@ -6,6 +6,7 @@ import {
   Entity,
   JoinColumn,
   ManyToOne,
+  OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
 import { Color } from '../common/entities/color.entity';
@@ -16,6 +17,7 @@ import { FuelType } from '../common/entities/fuelType.entity';
 import { EngineState } from '../common/entities/engineState.entity';
 import { ChassisState } from '../common/entities/chassisState.entity';
 import { BodyState } from '../common/entities/bodyState.entity';
+import { Notification } from '../notifications/notification.entity';
 
 @Entity({ name: 'Listings' })
 export class Listing {
@@ -105,4 +107,7 @@ export class Listing {
     onUpdate: 'CURRENT_TIMESTAMP',
   })
   updatedAt: Date;
+
+  @OneToMany(() => Notification, (notification) => notification.listing)
+  notifications: Notification[];
 }
