@@ -38,9 +38,9 @@ export class Listing {
   @JoinColumn({ name: 'makeId' })
   make: Make;
 
-  @ManyToOne(() => Model, (model) => model.listings)
+  @ManyToOne(() => Model, (model) => model.listings, { nullable: true })
   @JoinColumn({ name: 'modelId' })
-  model: Model;
+  model: Model | null;
 
   @Column({ type: 'integer' })
   year: number;

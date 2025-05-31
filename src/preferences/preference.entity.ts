@@ -65,7 +65,7 @@ export class Preference {
   @JoinColumn({ name: 'stateId' })
   state: State;
 
-  @ManyToOne(() => City, (city) => city.preferences)
+  @ManyToOne(() => City, (city) => city.preferences, { nullable: true })
   @JoinColumn({ name: 'cityId' })
   city: City;
 

@@ -78,15 +78,21 @@ export class PreferencesService {
     const state = await this.statesRepository.findOneBy({
       id: createPreferenceDto.stateId,
     });
-    const city = await this.citiesRepository.findOneBy({
-      id: createPreferenceDto.cityId,
-    });
+    const city = createPreferenceDto.cityId
+      ? await this.citiesRepository.findOneBy({
+          id: createPreferenceDto.cityId,
+        })
+      : null;
+
     const make = await this.makesRepository.findOneBy({
       id: createPreferenceDto.makeId,
     });
-    const model = await this.modelsRepository.findOneBy({
-      id: createPreferenceDto.modelId,
-    });
+    let model: Model | null = null;
+    if (createPreferenceDto.modelId) {
+      model = await this.modelsRepository.findOneBy({
+        id: createPreferenceDto.modelId,
+      });
+    }
     const colors = await this.findEntitiesByIds<Color>(
       this.colorsRepository,
       createPreferenceDto.colorIds,
@@ -178,10 +184,12 @@ export class PreferencesService {
         id: updatePreferenceDto.stateId,
       });
     }
-    if (updatePreferenceDto.cityId) {
-      existingPreference.city = await this.citiesRepository.findOneBy({
-        id: updatePreferenceDto.cityId,
-      });
+    if (updatePreferenceDto.cityId !== undefined) {
+      existingPreference.city = updatePreferenceDto.cityId
+        ? await this.citiesRepository.findOneBy({
+            id: updatePreferenceDto.cityId,
+          })
+        : null;
     }
     if (updatePreferenceDto.colorIds) {
       this.logger.log('#1 Finding colors', existingPreference.colors);
@@ -250,9 +258,14 @@ export class PreferencesService {
       .leftJoin('preference.chassisStates', 'chassisState')
       .leftJoin('preference.bodyStates', 'bodyState')
       .where('preference.stateId=:stateId', { stateId: carListing.state.id })
-      .andWhere('preference.cityId=:cityId', { cityId: carListing.city.id })
+      .andWhere('(preference.cityId IS NULL OR preference.cityId=:cityId)', {
+        cityId: carListing.city.id,
+      })
       .andWhere('preference.makeId=:makeId', { makeId: carListing.make.id })
-      .andWhere('preference.modelId=:modelId', { modelId: carListing.model.id })
+      .andWhere(
+        '(preference.modelId IS NULL OR CAST(:modelId AS integer) IS NULL OR preference.modelId = CAST(:modelId AS integer))',
+        { modelId: carListing.model ? carListing.model.id : null },
+      )
       .andWhere(
         '(preference.minPrice IS NULL OR :price >= preference.minPrice) AND (preference.maxPrice IS NULL OR :price <= preference.maxPrice)',
         { price: carListing.price },

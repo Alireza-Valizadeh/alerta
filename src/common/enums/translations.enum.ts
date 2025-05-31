@@ -3,7 +3,6 @@ export enum PersianGeneralStatements {
 }
 
 export enum PersianChassisStates {
-  Undefined = 'تعیین‌نشده',
   BothOk = 'سالم و پلمپ',
   BothNotOk = 'ضربه‌خورده',
   BothHasColor = 'رنگ‌شده',
@@ -12,14 +11,12 @@ export enum PersianChassisStates {
 }
 
 export enum PersianEngineStates {
-  Undefined = 'تعیین‌نشده',
   Ok = 'سالم',
   NeedsRepair = 'نیاز به تعمیر',
   Repaired = 'تعویض شده',
 }
 
 export enum PersianBodyStates {
-  Undefined = 'تعیین‌نشده',
   Perfect = 'سالم و بی‌خط و خش',
   MinorIssues = 'خط و خش جزیی',
   PDR = 'صافکاری بی‌رنگ',
@@ -31,7 +28,6 @@ export enum PersianBodyStates {
 }
 
 export enum PersianColors {
-  Undefined = 'تعیین‌نشده',
   Blue = 'آبی',
   Albaloei = 'آلبالویی',
   Atlasi = 'اطلسی',
@@ -74,7 +70,6 @@ export enum PersianColors {
 }
 
 export enum PersianFuelTypes {
-  Undefined = 'تعیین‌نشده',
   Petrol = 'بنزینی',
   CompanyCng = 'دوگانه‌سوز شرکتی',
   ManualCng = 'دوگانه‌سوز دستی',
@@ -84,7 +79,6 @@ export enum PersianFuelTypes {
 }
 
 export enum PersianGearboxes {
-  Undefined = 'تعیین‌نشده',
   Manual = 'دنده‌ای',
   Automatic = 'اتوماتیک',
 }

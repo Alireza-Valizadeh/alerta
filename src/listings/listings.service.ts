@@ -94,9 +94,12 @@ export class ListingsService {
     const make = await this.makesRepository.findOneBy({
       id: createListingDto.makeId,
     });
-    const model = await this.modelsRepository.findOneBy({
-      id: createListingDto.modelId,
-    });
+    let model: Model | null = null;
+    if (createListingDto.modelId) {
+      model = await this.modelsRepository.findOne({
+        where: { id: createListingDto.modelId },
+      });
+    }
     const state = await this.statesRepository.findOneBy({
       id: createListingDto.stateId,
     });
@@ -245,14 +248,9 @@ export class ListingsService {
     const make = await this.makesRepository.findOneBy({
       title: info.details.make,
     });
-    let model = await this.modelsRepository.findOneBy({
+    const model = await this.modelsRepository.findOneBy({
       title: info.details.make + ' ' + info.details.model,
     });
-    if (make && !model) {
-      model = await this.modelsRepository.findOneBy({
-        title: PersianTranslations.GeneralStatements.Undefined,
-      });
-    }
     const city = await this.citiesRepository.findOneBy({
       title: 'مشهد',
     });
@@ -281,7 +279,7 @@ export class ListingsService {
       cityId: city.id,
       stateId: state.id,
       makeId: make.id,
-      modelId: model.id,
+      modelId: model?.id || null,
     };
     return dto;
   }
@@ -384,7 +382,8 @@ export class ListingsService {
   }
   private async processListingsAndNotify(listings: Listing[]) {
     for (const listing of listings) {
-      const msg = `آگهی جدید: ${listing.model.title} مدل ${listing.year}
+      const name = listing.model?.title;
+      const msg = `آگهی جدید: ${name} مدل ${listing.year}
       ${listing.link}`;
       const uniqueUsers = new Map<number, User>();
       const phones: string[] = [];

@@ -4,7 +4,7 @@ export const createListingSchema = z.object({
   uid: z.number().int().positive(), // Expect the ID of the User
   title: z.string().min(1).max(150),
   makeId: z.number().int().positive(), // Expect the ID of the Make
-  modelId: z.number().int().positive(), // Expect the ID of the Model
+  modelId: z.number().int().positive().optional(), // Expect the ID of the Model
   year: z.number().int().min(1000).max(2030),
   colorId: z.number().int().positive(), // Expect the ID of the Color
   mileage: z.number().int().min(0),
