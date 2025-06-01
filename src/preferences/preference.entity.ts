@@ -20,6 +20,7 @@ import {
   OneToMany,
   PrimaryGeneratedColumn,
 } from 'typeorm';
+import { CreditTransaction } from '../credits/credit-transactions.entity';
 
 @Entity({ name: 'Preferences' })
 export class Preference {
@@ -92,4 +93,7 @@ export class Preference {
 
   @OneToMany(() => Notification, (notification) => notification.preference)
   notifications: Notification[];
+
+  @OneToMany(() => CreditTransaction, (credit) => credit.preference)
+  creditTransactions: CreditTransaction[];
 }

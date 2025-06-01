@@ -7,6 +7,8 @@ import {
   JoinColumn,
 } from 'typeorm';
 import { User } from '../users/user.entity';
+import { Listing } from '../listings/listing.entity';
+import { Preference } from '../preferences/preference.entity';
 
 export enum TransactionType {
   PURCHASE = 'PURCHASE',
@@ -40,6 +42,15 @@ export class CreditTransaction {
   @Column({ type: 'timestamp', default: () => 'CURRENT_TIMESTAMP' })
   createdAt: Date;
 
-  @Column({ type: 'integer', nullable: true })
-  relatedListingId: number | null;
+  @ManyToOne(() => Listing, (listing) => listing.creditTransactions, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'listingId' })
+  listing: Listing | null;
+
+  @ManyToOne(() => Preference, (preference) => preference.creditTransactions, {
+    nullable: true,
+  })
+  @JoinColumn({ name: 'preferenceId' })
+  preference: Preference | null;
 }

@@ -5,7 +5,7 @@ import { JwtModule } from '@nestjs/jwt';
 import { UsersModule } from '../users/users.module';
 import { jwtConstants } from './constants';
 import { NotificationsModule } from '../notifications/notifications.module';
-import { CreditsModule } from 'src/credits/credits.module';
+import { CreditsModule } from '../credits/credits.module';
 
 @Module({
   imports: [

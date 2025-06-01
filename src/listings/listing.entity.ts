@@ -18,6 +18,7 @@ import { EngineState } from '../common/entities/engineState.entity';
 import { ChassisState } from '../common/entities/chassisState.entity';
 import { BodyState } from '../common/entities/bodyState.entity';
 import { Notification } from '../notifications/notification.entity';
+import { CreditTransaction } from '../credits/credit-transactions.entity';
 
 @Entity({ name: 'Listings' })
 export class Listing {
@@ -110,4 +111,7 @@ export class Listing {
 
   @OneToMany(() => Notification, (notification) => notification.listing)
   notifications: Notification[];
+
+  @OneToMany(() => CreditTransaction, (credit) => credit.listing)
+  creditTransactions: CreditTransaction[];
 }

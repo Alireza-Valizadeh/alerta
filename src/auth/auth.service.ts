@@ -9,8 +9,9 @@ import { RedisService } from '../core/redis.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { Messages } from './constants';
 import { customAlphabet } from 'nanoid';
-import { CreditsService } from 'src/credits/credits.service';
-import { TransactionType } from 'src/credits/credit-transactions.entity';
+import { CreditsService } from '../credits/credits.service';
+import { TransactionType } from '../credits/credit-transactions.entity';
+import { PersianTranslations } from '../common/enums/translations.enum';
 
 @Injectable()
 export class AuthService {
@@ -43,8 +44,9 @@ export class AuthService {
       await this.creditsService.adjustCredits(
         user.id,
         20,
-        'اعتبار هدیه ثبت نام',
+        PersianTranslations.GeneralStatements.SignUpBonus,
         TransactionType.BONUS,
+        null,
         null,
       );
     }

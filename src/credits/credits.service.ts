@@ -7,6 +7,8 @@ import {
 } from './credit-transactions.entity';
 import { MyLoggerService } from '../core/logger.service';
 import { UsersService } from '../users/users.service';
+import { Listing } from '../listings/listing.entity';
+import { Preference } from 'src/preferences/preference.entity';
 
 @Injectable()
 export class CreditsService {
@@ -22,7 +24,8 @@ export class CreditsService {
     amount: number,
     description: string,
     type: TransactionType,
-    relatedListingId: number | null,
+    listing: Listing | null,
+    preference: Preference | null,
   ): Promise<void> {
     const user = await this.usersService.findOneById(uid);
     const credit = this.creditTransactionsRepository.create({
@@ -31,7 +34,8 @@ export class CreditsService {
       description,
       balanceAfter: user.balance + amount,
       type,
-      relatedListingId,
+      listing,
+      preference,
     });
     await this.creditTransactionsRepository.save(credit);
     this.logger.log(

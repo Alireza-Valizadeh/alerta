@@ -8,14 +8,16 @@ import { Notification } from './notification.entity';
 import { Repository } from 'typeorm';
 import { Preference } from '../preferences/preference.entity';
 import { Listing } from '../listings/listing.entity';
-// import { CreditsService } from '../credits/credits.service';
+import { CreditsService } from '../credits/credits.service';
+import { TransactionType } from '../credits/credit-transactions.entity';
+import { PersianTranslations } from '../common/enums/translations.enum';
 
 @Injectable()
 export class NotificationsService {
   private API_KEY: string;
   constructor(
     private readonly configService: ConfigService,
-    // private creditsService: CreditsService,
+    private creditsService: CreditsService,
     private readonly logger: MyLoggerService,
     @InjectRepository(Notification)
     private notificationRepository: Repository<Notification>,
@@ -30,7 +32,14 @@ export class NotificationsService {
     const user = preference.user;
     const phone = user.phone;
     const isSent = await this.sendSms([phone], text);
-    // TODO - remove credits on sms done
+    await this.creditsService.adjustCredits(
+      user.id,
+      -1,
+      PersianTranslations.GeneralStatements.NewSmsCost,
+      TransactionType.USAGE,
+      listing,
+      preference,
+    );
     return await this.saveNotification(preference, listing, text, isSent);
   }
 
