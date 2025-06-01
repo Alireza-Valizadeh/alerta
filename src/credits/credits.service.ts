@@ -50,13 +50,13 @@ export class CreditsService {
 
   async getCreditsTransactions(
     uid: number,
-  ): Promise<{ credits: CreditTransaction[]; balance: number }> {
-    const credits = await this.creditTransactionsRepository.find({
+  ): Promise<{ transactions: CreditTransaction[]; balance: number }> {
+    const transactions = await this.creditTransactionsRepository.find({
       where: { user: { id: uid } },
       order: { createdAt: 'DESC' },
     });
     const user = await this.usersService.findOneById(uid);
     const balance = user.balance || 0;
-    return { credits, balance };
+    return { transactions, balance };
   }
 }

@@ -10,7 +10,7 @@ export class CreditsController {
   @UseGuards(AuthGuard)
   getCreditsTransactions(
     @Request() request,
-  ): Promise<{ credits: CreditTransaction[]; balance: number }> {
+  ): Promise<{ transactions: CreditTransaction[]; balance: number }> {
     const uid = request.user.sub;
     return this.creditsService.getCreditsTransactions(uid);
   }
