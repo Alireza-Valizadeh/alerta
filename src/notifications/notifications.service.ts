@@ -8,12 +8,14 @@ import { Notification } from './notification.entity';
 import { Repository } from 'typeorm';
 import { Preference } from '../preferences/preference.entity';
 import { Listing } from '../listings/listing.entity';
+// import { CreditsService } from '../credits/credits.service';
 
 @Injectable()
 export class NotificationsService {
   private API_KEY: string;
   constructor(
     private readonly configService: ConfigService,
+    // private creditsService: CreditsService,
     private readonly logger: MyLoggerService,
     @InjectRepository(Notification)
     private notificationRepository: Repository<Notification>,
@@ -27,7 +29,8 @@ export class NotificationsService {
   ): Promise<Notification | null> {
     const user = preference.user;
     const phone = user.phone;
-    const isSent = await this.sendBulkSms([phone], text);
+    const isSent = await this.sendSms([phone], text);
+    // TODO - remove credits on sms done
     return await this.saveNotification(preference, listing, text, isSent);
   }
 
@@ -92,7 +95,7 @@ export class NotificationsService {
     }
   }
 
-  private async sendBulkSms(phones: string[], text: string): Promise<boolean> {
+  private async sendSms(phones: string[], text: string): Promise<boolean> {
     try {
       const { apiUrl, bulkSubUrl, lineNumber } = notificationConstants;
       const bulkUrl = apiUrl + bulkSubUrl;

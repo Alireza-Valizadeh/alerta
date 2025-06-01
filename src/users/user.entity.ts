@@ -3,6 +3,7 @@ import { Gender } from './enums/genders.enum';
 import { Listing } from '../listings/listing.entity';
 import { Preference } from '../preferences/preference.entity';
 import { Notification } from '../notifications/notification.entity';
+import { CreditTransaction } from '../credits/credit-transactions.entity';
 
 @Entity({ name: 'Users' })
 export class User {
@@ -38,4 +39,16 @@ export class User {
 
   @OneToMany(() => Notification, (notification) => notification.user)
   notifications: Notification[];
+
+  @OneToMany(() => CreditTransaction, (credit) => credit.user)
+  creditTransactions: CreditTransaction[];
+
+  @Column({ type: 'integer', default: 0 })
+  balance: number;
+
+  @Column({
+    type: 'timestamp',
+    default: () => 'CURRENT_TIMESTAMP',
+  })
+  lastCreditUpdate: Date;
 }

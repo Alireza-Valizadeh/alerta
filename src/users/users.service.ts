@@ -90,4 +90,14 @@ export class UsersService {
   findAll(): Promise<User[]> {
     return this.usersRepository.find();
   }
+
+  async updateUserBalance(uid: number, newBalance: number): Promise<User> {
+    const user = await this.usersRepository.findOneBy({ id: uid });
+    if (!user) {
+      throw new NotFoundException(`User with ID ${uid} not found.`);
+    }
+    user.balance = newBalance;
+    user.lastCreditUpdate = new Date();
+    return this.usersRepository.save(user);
+  }
 }

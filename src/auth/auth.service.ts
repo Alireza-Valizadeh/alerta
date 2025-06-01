@@ -9,6 +9,8 @@ import { RedisService } from '../core/redis.service';
 import { NotificationsService } from '../notifications/notifications.service';
 import { Messages } from './constants';
 import { customAlphabet } from 'nanoid';
+import { CreditsService } from 'src/credits/credits.service';
+import { TransactionType } from 'src/credits/credit-transactions.entity';
 
 @Injectable()
 export class AuthService {
@@ -17,6 +19,7 @@ export class AuthService {
     private usersService: UsersService,
     private redisService: RedisService,
     private notifService: NotificationsService,
+    private creditsService: CreditsService,
     private readonly logger: MyLoggerService,
   ) {}
   async validateUser(email: string, password: string): Promise<string> {
@@ -37,6 +40,13 @@ export class AuthService {
     let user = await this.usersService.findOneByPhone(userDto.phone);
     if (!user) {
       user = await this.usersService.registerV2(userDto);
+      await this.creditsService.adjustCredits(
+        user.id,
+        20,
+        'اعتبار هدیه ثبت نام',
+        TransactionType.BONUS,
+        null,
+      );
     }
     const code = await this.generate2faCode();
     this.logger.log('code generated', { phone: user.phone, code });

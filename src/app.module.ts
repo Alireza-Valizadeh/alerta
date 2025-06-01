@@ -13,6 +13,7 @@ import { CommonModule } from './common/common.module';
 import { DatabaseModule } from './database/database.module';
 import { RedisService } from './core/redis.service';
 import { CoreModule } from './core/core.module';
+import { CreditsModule } from './credits/credits.module';
 
 @Module({
   imports: [
@@ -43,6 +44,7 @@ import { CoreModule } from './core/core.module';
     CommonModule,
     DatabaseModule,
     CoreModule,
+    CreditsModule,
   ],
   controllers: [AppController],
   providers: [AppService, RedisService],

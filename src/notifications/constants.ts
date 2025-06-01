@@ -5,4 +5,5 @@ export const notificationConstants = {
   bulkSubUrl: '/bulk',
   verifySubUrl: '/verify',
   templateId: 615328,
+  costPerSms: 1,
 };
