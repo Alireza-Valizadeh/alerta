@@ -163,8 +163,9 @@ export class ListingsService {
   }
 
   getUserListings(uid: number): Promise<Listing[]> {
-    return this.listingsRepository.findBy({
-      user: { id: uid },
+    return this.listingsRepository.find({
+      where: { user: { id: uid } },
+      order: { createdAt: 'DESC' },
     });
   }
 

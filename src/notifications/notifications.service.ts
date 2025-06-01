@@ -59,6 +59,7 @@ export class NotificationsService {
     try {
       const notifications = this.notificationRepository.find({
         where: { user: { id: uid } },
+        order: { createdAt: 'DESC' },
         relations: ['preference', 'listing'],
       });
       return notifications;

@@ -138,6 +138,7 @@ export class PreferencesService {
     return this.preferenceRepository.find({
       relations: this.relations,
       where: { user: { id: uid } },
+      order: { id: 'DESC' },
     });
   }
 
