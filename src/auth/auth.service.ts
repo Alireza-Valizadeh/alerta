@@ -40,7 +40,9 @@ export class AuthService {
   async loginByCode(userDto: RegisterUserV2Dto): Promise<void> {
     let user = await this.usersService.findOneByPhone(userDto.phone);
     if (!user) {
+      this.logger.log('New user registered', userDto);
       user = await this.usersService.registerV2(userDto);
+      this.logger.log('User registered', user);
       await this.creditsService.adjustCredits(
         user.id,
         20,

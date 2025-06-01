@@ -37,10 +37,15 @@ export class CreditsService {
       listing,
       preference,
     });
-    await this.creditTransactionsRepository.save(credit);
+    await this.creditTransactionsRepository.save(credit, {
+      transaction: true,
+    });
     this.logger.log(
-      `Credit added to user ${user.id}: $${credit} Reason: ${description}`,
+      `Credit added to user ${user.id}: $${credit.amount} Reason: ${description}`,
     );
+    await this.usersService.updateUserBalance(user.id, credit.balanceAfter, {
+      transaction: true,
+    });
   }
 
   async getCreditsTransactions(

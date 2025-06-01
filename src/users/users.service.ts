@@ -5,7 +5,7 @@ import {
 } from '@nestjs/common';
 import { User } from './user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository, UpdateResult } from 'typeorm';
+import { Repository, SaveOptions, UpdateResult } from 'typeorm';
 import * as bcrypt from 'bcrypt';
 import { userConstants } from './constants';
 import { UserMessages } from './enums/user-messages.enum';
@@ -56,8 +56,8 @@ export class UsersService {
     const user = this.usersRepository.create({
       phone: userDto.phone,
     });
-    await this.usersRepository.save(userDto);
-    return user;
+    const savedUser = await this.usersRepository.save(user);
+    return savedUser;
   }
 
   update(id: number, user: Partial<User>): Promise<UpdateResult> {
@@ -91,13 +91,19 @@ export class UsersService {
     return this.usersRepository.find();
   }
 
-  async updateUserBalance(uid: number, newBalance: number): Promise<User> {
+  async updateUserBalance(
+    uid: number,
+    newBalance: number,
+    options?: SaveOptions,
+  ): Promise<User> {
     const user = await this.usersRepository.findOneBy({ id: uid });
     if (!user) {
       throw new NotFoundException(`User with ID ${uid} not found.`);
     }
     user.balance = newBalance;
     user.lastCreditUpdate = new Date();
-    return this.usersRepository.save(user);
+    return this.usersRepository.save(user, {
+      transaction: options?.transaction,
+    });
   }
 }
