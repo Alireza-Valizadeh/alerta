@@ -31,16 +31,18 @@ export class NotificationsService {
   ): Promise<Notification | null> {
     const user = preference.user;
     const phone = user.phone;
-    const isSent = await this.sendSms([phone], text);
-    await this.creditsService.adjustCredits(
-      user.id,
-      -1,
-      PersianTranslations.GeneralStatements.NewSmsCost,
-      TransactionType.USAGE,
-      listing,
-      preference,
-    );
-    return await this.saveNotification(preference, listing, text, isSent);
+    const cost = await this.sendSms([phone], text);
+    if (cost) {
+      await this.creditsService.adjustCredits(
+        user.id,
+        cost * -1,
+        PersianTranslations.GeneralStatements.NewSmsCost,
+        TransactionType.USAGE,
+        listing,
+        preference,
+      );
+    }
+    return await this.saveNotification(preference, listing, text, !!cost);
   }
 
   async sendVertificationCode(phone: string, code: string) {
@@ -104,7 +106,10 @@ export class NotificationsService {
     }
   }
 
-  private async sendSms(phones: string[], text: string): Promise<boolean> {
+  private async sendSms(
+    phones: string[],
+    text: string,
+  ): Promise<number | null> {
     try {
       const { apiUrl, bulkSubUrl, lineNumber } = notificationConstants;
       const bulkUrl = apiUrl + bulkSubUrl;
@@ -124,10 +129,11 @@ export class NotificationsService {
       );
       this.logger.log({ response: response.data });
       this.logger.log('sent Bulk Sms', phones, text);
-      return true;
+      const data = response.data as any;
+      return data?.data.cost;
     } catch (error) {
       this.logger.error('sendBulkSms error', error);
-      return false;
+      return null;
     }
   }
 }
