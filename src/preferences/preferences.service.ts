@@ -231,6 +231,7 @@ export class PreferencesService {
       return this.findOne(id);
     } catch (error) {
       this.logger.log('Error updating preference', error);
+
       return null;
     }
   }
