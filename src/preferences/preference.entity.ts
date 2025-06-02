@@ -22,6 +22,7 @@ import {
 } from 'typeorm';
 import { CreditTransaction } from '../credits/credit-transactions.entity';
 
+
 @Entity({ name: 'Preferences' })
 export class Preference {
   @PrimaryGeneratedColumn()
