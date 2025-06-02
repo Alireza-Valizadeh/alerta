@@ -258,7 +258,8 @@ export class PreferencesService {
       .leftJoin('preference.engineStates', 'engineState')
       .leftJoin('preference.chassisStates', 'chassisState')
       .leftJoin('preference.bodyStates', 'bodyState')
-      .where('preference.stateId=:stateId', { stateId: carListing.state.id })
+      .where('preference.isDisabled=:isDisabled', { isDisabled: false })
+      .andWhere('preference.stateId=:stateId', { stateId: carListing.state.id })
       .andWhere('(preference.cityId IS NULL OR preference.cityId=:cityId)', {
         cityId: carListing.city.id,
       })

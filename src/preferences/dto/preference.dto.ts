@@ -1,6 +1,7 @@
 import { z } from 'zod';
 
 export const createPreferenceSchema = z.object({
+  name: z.string().max(50).optional(),
   minYear: z.number().int().nullable(),
   maxYear: z.number().int().nullable(),
   minInsuranceDuration: z.number().int().nullable(),
@@ -19,6 +20,7 @@ export const createPreferenceSchema = z.object({
   engineStateIds: z.array(z.number().int()).optional(),
   chassisStateIds: z.array(z.number().int()).optional(),
   bodyStateIds: z.array(z.number().int()).optional(),
+  isDisabled: z.boolean().default(false),
 });
 export const updatePreferenceSchema = createPreferenceSchema.partial();
 
