@@ -156,78 +156,83 @@ export class PreferencesService {
     updatePreferenceDto: UpdatePreferenceDto,
   ): Promise<Preference | null> {
     this.logger.log('Updating preference', { id }, { updatePreferenceDto });
-    const existingPreference = await this.preferenceRepository.findOne({
-      where: { id },
-      relations: this.relations,
-    });
-    if (!existingPreference) {
-      throw new NotFoundException(`Preference with ID ${id} not found`);
-    }
-    Object.assign(existingPreference, updatePreferenceDto);
+    try {
+      const existingPreference = await this.preferenceRepository.findOne({
+        where: { id },
+        relations: this.relations,
+      });
+      if (!existingPreference) {
+        throw new NotFoundException(`Preference with ID ${id} not found`);
+      }
+      Object.assign(existingPreference, updatePreferenceDto);
 
-    if (existingPreference.user.id !== uid) {
-      throw new ForbiddenException(
-        'You are not authorized to update this preference',
-      );
-    }
-    if (updatePreferenceDto.makeId) {
-      existingPreference.make = await this.makesRepository.findOneBy({
-        id: updatePreferenceDto.makeId,
-      });
-    }
-    if (updatePreferenceDto.modelId) {
-      existingPreference.model = await this.modelsRepository.findOneBy({
-        id: updatePreferenceDto.modelId,
-      });
-    }
-    if (updatePreferenceDto.stateId) {
-      existingPreference.state = await this.statesRepository.findOneBy({
-        id: updatePreferenceDto.stateId,
-      });
-    }
-    if (updatePreferenceDto.cityId !== undefined) {
-      existingPreference.city = updatePreferenceDto.cityId
-        ? await this.citiesRepository.findOneBy({
-            id: updatePreferenceDto.cityId,
-          })
-        : null;
-    }
-    if (updatePreferenceDto.colorIds) {
-      this.logger.log('#1 Finding colors', existingPreference.colors);
-      existingPreference.colors = await this.colorsRepository.findBy({
-        id: In(updatePreferenceDto.colorIds),
-      });
-      this.logger.log('#2 Finding colors', existingPreference.colors);
-    }
-    if (updatePreferenceDto.gearboxIds) {
-      existingPreference.gearboxes = await this.gearboxesRepository.findBy({
-        id: In(updatePreferenceDto.gearboxIds),
-      });
-    }
-    if (updatePreferenceDto.fuelTypeIds) {
-      existingPreference.fuelTypes = await this.fuelTypesRepository.findBy({
-        id: In(updatePreferenceDto.fuelTypeIds),
-      });
-    }
-    if (updatePreferenceDto.engineStateIds) {
-      existingPreference.engineStates =
-        await this.engineStatesRepository.findBy({
-          id: In(updatePreferenceDto.engineStateIds),
+      if (existingPreference.user.id !== uid) {
+        throw new ForbiddenException(
+          'You are not authorized to update this preference',
+        );
+      }
+      if (updatePreferenceDto.makeId) {
+        existingPreference.make = await this.makesRepository.findOneBy({
+          id: updatePreferenceDto.makeId,
         });
-    }
-    if (updatePreferenceDto.chassisStateIds) {
-      existingPreference.chassisStates =
-        await this.chassisStatesRepository.findBy({
-          id: In(updatePreferenceDto.chassisStateIds),
+      }
+      if (updatePreferenceDto.modelId) {
+        existingPreference.model = await this.modelsRepository.findOneBy({
+          id: updatePreferenceDto.modelId,
         });
+      }
+      if (updatePreferenceDto.stateId) {
+        existingPreference.state = await this.statesRepository.findOneBy({
+          id: updatePreferenceDto.stateId,
+        });
+      }
+      if (updatePreferenceDto.cityId !== undefined) {
+        existingPreference.city = updatePreferenceDto.cityId
+          ? await this.citiesRepository.findOneBy({
+              id: updatePreferenceDto.cityId,
+            })
+          : null;
+      }
+      if (updatePreferenceDto.colorIds) {
+        this.logger.log('#1 Finding colors', existingPreference.colors);
+        existingPreference.colors = await this.colorsRepository.findBy({
+          id: In(updatePreferenceDto.colorIds),
+        });
+        this.logger.log('#2 Finding colors', existingPreference.colors);
+      }
+      if (updatePreferenceDto.gearboxIds) {
+        existingPreference.gearboxes = await this.gearboxesRepository.findBy({
+          id: In(updatePreferenceDto.gearboxIds),
+        });
+      }
+      if (updatePreferenceDto.fuelTypeIds) {
+        existingPreference.fuelTypes = await this.fuelTypesRepository.findBy({
+          id: In(updatePreferenceDto.fuelTypeIds),
+        });
+      }
+      if (updatePreferenceDto.engineStateIds) {
+        existingPreference.engineStates =
+          await this.engineStatesRepository.findBy({
+            id: In(updatePreferenceDto.engineStateIds),
+          });
+      }
+      if (updatePreferenceDto.chassisStateIds) {
+        existingPreference.chassisStates =
+          await this.chassisStatesRepository.findBy({
+            id: In(updatePreferenceDto.chassisStateIds),
+          });
+      }
+      if (updatePreferenceDto.bodyStateIds) {
+        existingPreference.bodyStates = await this.bodyStatesRepository.findBy({
+          id: In(updatePreferenceDto.bodyStateIds),
+        });
+      }
+      await this.preferenceRepository.save(existingPreference);
+      return this.findOne(id);
+    } catch (error) {
+      this.logger.log('Error updating preference', error);
+      return null;
     }
-    if (updatePreferenceDto.bodyStateIds) {
-      existingPreference.bodyStates = await this.bodyStatesRepository.findBy({
-        id: In(updatePreferenceDto.bodyStateIds),
-      });
-    }
-    await this.preferenceRepository.save(existingPreference);
-    return this.findOne(id);
   }
 
   async delete(uid: number, id: number): Promise<Preference> {
