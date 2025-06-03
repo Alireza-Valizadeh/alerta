@@ -136,10 +136,9 @@ export class PreferencesService {
 
   async findAll(uid: number): Promise<Preference[]> {
     return this.preferenceRepository.find({
-      relations: this.relations,
       where: { user: { id: uid } },
       order: { id: 'DESC' },
-      // loadRelationIds: true,
+      loadRelationIds: true,
     });
   }
 
