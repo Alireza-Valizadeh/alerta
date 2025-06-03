@@ -14,6 +14,7 @@ import {
   Column,
   DeleteDateColumn,
   Entity,
+  Index,
   JoinColumn,
   ManyToMany,
   ManyToOne,
@@ -28,6 +29,8 @@ export class Preference {
   id: number;
 
   @ManyToOne(() => User, (user) => user.preferences)
+  @JoinColumn({ name: 'userId'})
+  @Index()
   user: User;
 
   @Column({ type: 'varchar', length: 50, nullable: true })
@@ -59,18 +62,22 @@ export class Preference {
 
   @ManyToOne(() => Make, (make) => make.preferences)
   @JoinColumn({ name: 'makeId' })
+  @Index()
   make: Make;
 
   @ManyToOne(() => Model, (model) => model.preferences)
   @JoinColumn({ name: 'modelId' })
+  @Index()
   model: Model;
 
   @ManyToOne(() => State, (state) => state.preferences)
   @JoinColumn({ name: 'stateId' })
+  @Index()
   state: State;
 
   @ManyToOne(() => City, (city) => city.preferences, { nullable: true })
   @JoinColumn({ name: 'cityId' })
+  @Index()
   city: City;
 
   @ManyToMany(() => Color, (color) => color.preferences)
@@ -101,5 +108,6 @@ export class Preference {
   creditTransactions: CreditTransaction[];
 
   @Column({ type: 'boolean', default: false })
+  @Index()
   isDisabled: boolean;
 }
