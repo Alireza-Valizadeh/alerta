@@ -135,21 +135,11 @@ export class PreferencesService {
   }
 
   async findAll(uid: number): Promise<Preference[]> {
-    return this.preferenceRepository
-      .createQueryBuilder('preference')
-      .leftJoinAndSelect('preference.make', 'make')
-      .leftJoinAndSelect('preference.model', 'model')
-      .leftJoinAndSelect('preference.state', 'state')
-      .leftJoinAndSelect('preference.city', 'city')
-      .leftJoinAndSelect('preference.colors', 'color')
-      .leftJoinAndSelect('preference.gearboxes', 'gearbox')
-      .leftJoinAndSelect('preference.bodyStates', 'bodyState')
-      .leftJoinAndSelect('preference.chassisStates', 'chassisState')
-      .leftJoinAndSelect('preference.engineStates', 'engineState')
-      .leftJoinAndSelect('preference.fuelTypes', 'fuelType')
-      .where('preference.userId = :uid', { uid })
-      .orderBy('preference.id', 'DESC')
-      .getMany();
+    return this.preferenceRepository.find({
+      where: { user: { id: uid } },
+      order: { id: 'DESC' },
+      loadRelationIds: true,
+    });
   }
 
   async findOne(id: number): Promise<Preference | null> {

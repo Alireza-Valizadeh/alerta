@@ -19,6 +19,7 @@ import * as IranCities from './cities.json';
 import * as Makes from './makes.json';
 import * as Models from './models.json';
 import * as Users from './users.json';
+import { RedisService } from 'src/core/redis.service';
 
 @Injectable()
 export class SeedService implements OnModuleInit {
@@ -46,6 +47,7 @@ export class SeedService implements OnModuleInit {
     private readonly chassisStateRepository: Repository<ChassisState>,
     @InjectRepository(BodyState)
     private readonly bodyStateRepository: Repository<BodyState>,
+    private redisService: RedisService,
   ) {}
 
   async onModuleInit() {
@@ -100,6 +102,8 @@ export class SeedService implements OnModuleInit {
       );
       await this.colorRepository.save(colorsToSeed);
     }
+    const allColors = await this.colorRepository.find();
+    await this.cacheLookupMap('colors', allColors);
   }
 
   async seedFuelTypes() {
@@ -181,5 +185,13 @@ export class SeedService implements OnModuleInit {
       });
       await this.modelRepository.save(modelsToSeed);
     }
+  }
+
+  private async cacheLookupMap(
+    key: string,
+    items: { id: number; title: string }[],
+  ) {
+    const map = Object.fromEntries(items.map((item) => [item.id, item.title]));
+    await this.redisService.set(`lookup:${key}`, JSON.stringify(map));
   }
 }
