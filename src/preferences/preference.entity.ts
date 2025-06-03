@@ -104,8 +104,8 @@ export class Preference {
   @OneToMany(() => Notification, (notification) => notification.preference)
   notifications: Notification[];
 
-  @OneToMany(() => CreditTransaction, (credit) => credit.preference)
-  creditTransactions: CreditTransaction[];
+  // @OneToMany(() => CreditTransaction, (credit) => credit.preference)
+  // creditTransactions: CreditTransaction[];
 
   @Column({ type: 'boolean', default: false })
   @Index()
