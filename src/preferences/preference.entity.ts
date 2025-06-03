@@ -30,8 +30,8 @@ export class Preference {
   @ManyToOne(() => User, (user) => user.preferences)
   user: User;
 
-  // @Column({ type: 'varchar', length: 50, nullable: true })
-  // name: string | null;
+  @Column({ type: 'varchar', length: 50, nullable: true })
+  name: string | null;
 
   @Column({ type: 'integer', nullable: true })
   minYear: number | null;
@@ -100,6 +100,6 @@ export class Preference {
   @OneToMany(() => CreditTransaction, (credit) => credit.preference)
   creditTransactions: CreditTransaction[];
 
-  // @Column({ type: 'boolean', default: false })
-  // isDisabled: boolean;
+  @Column({ type: 'boolean', default: false })
+  isDisabled: boolean;
 }
