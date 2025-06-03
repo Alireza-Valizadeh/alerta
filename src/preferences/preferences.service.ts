@@ -139,7 +139,7 @@ export class PreferencesService {
       relations: this.relations,
       where: { user: { id: uid } },
       order: { id: 'DESC' },
-      loadRelationIds: true,
+      // loadRelationIds: true,
     });
   }
 
