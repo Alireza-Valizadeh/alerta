@@ -140,7 +140,17 @@ export class PreferencesService {
     const prefs = await this.preferenceRepository.find({
       where: { user: { id: uid } },
       order: { id: 'DESC' },
-      loadRelationIds: true,
+      relations: ['make', 'model', 'state', 'city'],
+      loadRelationIds: {
+        relations: [
+          'gearboxes',
+          'colors',
+          'fuelTypes',
+          'engineStates',
+          'chassisStates',
+          'bodyStates',
+        ],
+      },
     });
     return await this.hydratePreferenceRelationsFromCache(prefs);
   }
@@ -378,10 +388,6 @@ export class PreferencesService {
       engineStatesMap,
       chassisStatesMap,
       bodyStatesMap,
-      statesMap,
-      citiesMap,
-      makesMap,
-      modelsMap,
     ] = await Promise.all([
       this.getCachedLookupMap('colors'),
       this.getCachedLookupMap('gearboxes'),
@@ -389,10 +395,6 @@ export class PreferencesService {
       this.getCachedLookupMap('engineStates'),
       this.getCachedLookupMap('chassisStates'),
       this.getCachedLookupMap('bodyStates'),
-      this.getCachedLookupMap('states'),
-      this.getCachedLookupMap('cities'),
-      this.getCachedLookupMap('makes'),
-      this.getCachedLookupMap('models'),
     ]);
     const hydratedPreferences = preferences.map((pref) => {
       pref.colors = ((pref.colors as unknown as number[]) || []).map(
@@ -432,25 +434,6 @@ export class PreferencesService {
             id: bodyStateId,
           }) as BodyState,
       );
-      // Hydrate ManyToOne relations (single ID to single object)
-      // Check if the ID exists before trying to find the object
-      const makeId = (pref.make as any)?.id;
-      pref.make = makeId
-        ? ({ title: makesMap[makeId], id: makeId } as Make)
-        : null;
-      const modelId = (pref.model as any)?.id;
-      pref.model = modelId
-        ? ({ title: modelsMap[modelId], id: modelId } as Model)
-        : null;
-
-      const stateId = (pref.state as any)?.id;
-      pref.state = stateId
-        ? ({ title: statesMap[stateId], id: stateId } as State)
-        : null;
-      const cityId = (pref.city as any)?.id;
-      pref.city = cityId
-        ? ({ title: citiesMap[cityId], id: cityId } as City)
-        : null;
       return pref;
     });
     return hydratedPreferences;
