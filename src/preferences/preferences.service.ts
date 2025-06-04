@@ -360,7 +360,7 @@ export class PreferencesService {
     }
   }
 
-  private async getCachedLookupMap<T>(key: string): Promise<T[]> {
+  private async getCachedLookupMap(key: string): Promise<object> {
     const map = await this.redisService.get(`lookup:${key}`);
     if (!map) {
       return [];
@@ -383,67 +383,73 @@ export class PreferencesService {
       makesMap,
       modelsMap,
     ] = await Promise.all([
-      this.getCachedLookupMap<Color>('colors'),
-      this.getCachedLookupMap<Gearbox>('gearboxes'),
-      this.getCachedLookupMap<FuelType>('fuelTypes'),
-      this.getCachedLookupMap<EngineState>('engineStates'),
-      this.getCachedLookupMap<ChassisState>('chassisStates'),
-      this.getCachedLookupMap<BodyState>('bodyStates'),
-      this.getCachedLookupMap<State>('states'),
-      this.getCachedLookupMap<City>('cities'),
-      this.getCachedLookupMap<Make>('makes'),
-      this.getCachedLookupMap<Model>('models'),
+      this.getCachedLookupMap('colors'),
+      this.getCachedLookupMap('gearboxes'),
+      this.getCachedLookupMap('fuelTypes'),
+      this.getCachedLookupMap('engineStates'),
+      this.getCachedLookupMap('chassisStates'),
+      this.getCachedLookupMap('bodyStates'),
+      this.getCachedLookupMap('states'),
+      this.getCachedLookupMap('cities'),
+      this.getCachedLookupMap('makes'),
+      this.getCachedLookupMap('models'),
     ]);
     const hydratedPreferences = preferences.map((pref) => {
-      pref.colors = ((pref.colors as unknown as number[]) || [])
-        .map((colorId) => colorsMap.find((c) => c.id === colorId) || null)
-        .filter(Boolean) as Color[];
-      pref.gearboxes = ((pref.gearboxes as unknown as number[]) || [])
-        .map(
-          (gearboxId) => gearboxesMap.find((g) => g.id === gearboxId) || null,
-        )
-        .filter(Boolean) as Gearbox[];
-      pref.fuelTypes = ((pref.fuelTypes as unknown as number[]) || [])
-        .map(
-          (fuelTypeId) => fuelTypesMap.find((f) => f.id === fuelTypeId) || null,
-        )
-        .filter(Boolean) as FuelType[];
-      pref.engineStates = ((pref.engineStates as unknown as number[]) || [])
-        .map(
-          (engineStateId) =>
-            engineStatesMap.find((e) => e.id === engineStateId) || null,
-        )
-        .filter(Boolean) as EngineState[];
-      pref.chassisStates = ((pref.chassisStates as unknown as number[]) || [])
-        .map(
-          (chassisStateId) =>
-            chassisStatesMap.find((c) => c.id === chassisStateId) || null,
-        )
-        .filter(Boolean) as ChassisState[];
-      pref.bodyStates = ((pref.bodyStates as unknown as number[]) || [])
-        .map(
-          (bodyStateId) =>
-            bodyStatesMap.find((b) => b.id === bodyStateId) || null,
-        )
-        .filter(Boolean) as BodyState[];
+      pref.colors = ((pref.colors as unknown as number[]) || []).map(
+        (colorId) => ({ title: colorsMap[colorId], id: colorId }) as Color,
+      );
+      pref.gearboxes = ((pref.gearboxes as unknown as number[]) || []).map(
+        (gearboxId) =>
+          ({ title: gearboxesMap[gearboxId], id: gearboxId }) as Gearbox,
+      );
+      pref.fuelTypes = ((pref.fuelTypes as unknown as number[]) || []).map(
+        (fuelTypeId) =>
+          ({ title: fuelTypesMap[fuelTypeId], id: fuelTypeId }) as FuelType,
+      );
 
+      pref.engineStates = (
+        (pref.engineStates as unknown as number[]) || []
+      ).map(
+        (engineStateId) =>
+          ({
+            title: engineStatesMap[engineStateId],
+            id: engineStateId,
+          }) as EngineState,
+      );
+      pref.chassisStates = (
+        (pref.chassisStates as unknown as number[]) || []
+      ).map(
+        (chassisStateId) =>
+          ({
+            title: chassisStatesMap[chassisStateId],
+            id: chassisStateId,
+          }) as ChassisState,
+      );
+      pref.bodyStates = ((pref.bodyStates as unknown as number[]) || []).map(
+        (bodyStateId) =>
+          ({
+            title: bodyStatesMap[bodyStateId],
+            id: bodyStateId,
+          }) as BodyState,
+      );
       // Hydrate ManyToOne relations (single ID to single object)
       // Check if the ID exists before trying to find the object
-      pref.make = (pref.make as any)?.id
-        ? ((makesMap.find((m) => m.id === (pref.make as any).id) ||
-            null) as Make)
+      const makeId = (pref.make as any)?.id;
+      pref.make = makeId
+        ? ({ title: makesMap[makeId], id: makeId } as Make)
         : null;
-      pref.model = (pref.model as any)?.id
-        ? ((modelsMap.find((m) => m.id === (pref.model as any).id) ||
-            null) as Model)
+      const modelId = (pref.model as any)?.id;
+      pref.model = modelId
+        ? ({ title: modelsMap[modelId], id: modelId } as Model)
         : null;
-      pref.state = (pref.state as any)?.id
-        ? ((statesMap.find((s) => s.id === (pref.state as any).id) ||
-            null) as State)
+
+      const stateId = (pref.state as any)?.id;
+      pref.state = stateId
+        ? ({ title: statesMap[stateId], id: stateId } as State)
         : null;
-      pref.city = (pref.city as any)?.id
-        ? ((citiesMap.find((c) => c.id === (pref.city as any).id) ||
-            null) as City)
+      const cityId = (pref.city as any)?.id;
+      pref.city = cityId
+        ? ({ title: citiesMap[cityId], id: cityId } as City)
         : null;
       return pref;
     });
