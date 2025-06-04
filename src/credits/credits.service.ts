@@ -8,7 +8,7 @@ import {
 import { MyLoggerService } from '../core/logger.service';
 import { UsersService } from '../users/users.service';
 import { Listing } from '../listings/listing.entity';
-import { Preference } from 'src/preferences/preference.entity';
+import { Preference } from '../preferences/preference.entity';
 
 @Injectable()
 export class CreditsService {

@@ -1,4 +1,3 @@
-// src/credits/credit-transaction.entity.ts
 import {
   Entity,
   PrimaryGeneratedColumn,

@@ -20,10 +20,18 @@ export class RedisService implements OnModuleInit, OnModuleDestroy {
       password,
       lazyConnect: true,
     });
+    this.client.on('error', (err) => {
+      this.logger.error('ioredis client error', err.stack, 'RedisService');
+    });
   }
 
   async onModuleInit() {
-    await this.client.connect();
+    if (
+      this.client.status !== 'connecting' &&
+      this.client.status !== 'connect'
+    ) {
+      await this.client.connect();
+    }
   }
 
   async onModuleDestroy() {

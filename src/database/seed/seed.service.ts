@@ -19,7 +19,7 @@ import * as IranCities from './cities.json';
 import * as Makes from './makes.json';
 import * as Models from './models.json';
 import * as Users from './users.json';
-import { RedisService } from 'src/core/redis.service';
+import { RedisService } from '../../core/redis.service';
 
 @Injectable()
 export class SeedService implements OnModuleInit {
