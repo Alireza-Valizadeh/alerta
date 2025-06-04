@@ -29,7 +29,7 @@ export class Preference {
   id: number;
 
   @ManyToOne(() => User, (user) => user.preferences)
-  @JoinColumn({ name: 'userId'})
+  @JoinColumn({ name: 'userId' })
   @Index()
   user: User;
 

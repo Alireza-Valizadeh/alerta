@@ -20,6 +20,7 @@ import { State } from '../common/entities/state.entity';
 import { User } from '../users/user.entity';
 import { MyLoggerService } from '../core/logger.service';
 import { Listing } from '../listings/listing.entity';
+import { RedisService } from '../core/redis.service';
 
 @Injectable()
 export class PreferencesService {
@@ -49,6 +50,7 @@ export class PreferencesService {
     private modelsRepository: Repository<Model>,
     @InjectRepository(State)
     private statesRepository: Repository<State>,
+    private redisService: RedisService,
     private logger: MyLoggerService,
   ) {
     this.relations = [
@@ -135,11 +137,12 @@ export class PreferencesService {
   }
 
   async findAll(uid: number): Promise<Preference[]> {
-    return this.preferenceRepository.find({
+    const prefs = await this.preferenceRepository.find({
       where: { user: { id: uid } },
       order: { id: 'DESC' },
       loadRelationIds: true,
     });
+    return await this.hydratePreferenceRelationsFromCache(prefs);
   }
 
   async findOne(id: number): Promise<Preference | null> {
@@ -355,5 +358,95 @@ export class PreferencesService {
       this.logger.log('Error finding entities by ids', error);
       return [];
     }
+  }
+
+  private async getCachedLookupMap<T>(key: string): Promise<T[]> {
+    const map = await this.redisService.get(`lookup:${key}`);
+    if (!map) {
+      return [];
+    }
+    return JSON.parse(map);
+  }
+
+  private async hydratePreferenceRelationsFromCache(
+    preferences: Preference[],
+  ): Promise<Preference[]> {
+    const [
+      colorsMap,
+      gearboxesMap,
+      fuelTypesMap,
+      engineStatesMap,
+      chassisStatesMap,
+      bodyStatesMap,
+      statesMap,
+      citiesMap,
+      makesMap,
+      modelsMap,
+    ] = await Promise.all([
+      this.getCachedLookupMap<Color>('colors'),
+      this.getCachedLookupMap<Gearbox>('gearboxes'),
+      this.getCachedLookupMap<FuelType>('fuelTypes'),
+      this.getCachedLookupMap<EngineState>('engineStates'),
+      this.getCachedLookupMap<ChassisState>('chassisStates'),
+      this.getCachedLookupMap<BodyState>('bodyStates'),
+      this.getCachedLookupMap<State>('states'),
+      this.getCachedLookupMap<City>('cities'),
+      this.getCachedLookupMap<Make>('makes'),
+      this.getCachedLookupMap<Model>('models'),
+    ]);
+    const hydratedPreferences = preferences.map((pref) => {
+      pref.colors = ((pref.colors as unknown as number[]) || [])
+        .map((colorId) => colorsMap.find((c) => c.id === colorId) || null)
+        .filter(Boolean) as Color[];
+      pref.gearboxes = ((pref.gearboxes as unknown as number[]) || [])
+        .map(
+          (gearboxId) => gearboxesMap.find((g) => g.id === gearboxId) || null,
+        )
+        .filter(Boolean) as Gearbox[];
+      pref.fuelTypes = ((pref.fuelTypes as unknown as number[]) || [])
+        .map(
+          (fuelTypeId) => fuelTypesMap.find((f) => f.id === fuelTypeId) || null,
+        )
+        .filter(Boolean) as FuelType[];
+      pref.engineStates = ((pref.engineStates as unknown as number[]) || [])
+        .map(
+          (engineStateId) =>
+            engineStatesMap.find((e) => e.id === engineStateId) || null,
+        )
+        .filter(Boolean) as EngineState[];
+      pref.chassisStates = ((pref.chassisStates as unknown as number[]) || [])
+        .map(
+          (chassisStateId) =>
+            chassisStatesMap.find((c) => c.id === chassisStateId) || null,
+        )
+        .filter(Boolean) as ChassisState[];
+      pref.bodyStates = ((pref.bodyStates as unknown as number[]) || [])
+        .map(
+          (bodyStateId) =>
+            bodyStatesMap.find((b) => b.id === bodyStateId) || null,
+        )
+        .filter(Boolean) as BodyState[];
+
+      // Hydrate ManyToOne relations (single ID to single object)
+      // Check if the ID exists before trying to find the object
+      pref.make = (pref.make as any)?.id
+        ? ((makesMap.find((m) => m.id === (pref.make as any).id) ||
+            null) as Make)
+        : null;
+      pref.model = (pref.model as any)?.id
+        ? ((modelsMap.find((m) => m.id === (pref.model as any).id) ||
+            null) as Model)
+        : null;
+      pref.state = (pref.state as any)?.id
+        ? ((statesMap.find((s) => s.id === (pref.state as any).id) ||
+            null) as State)
+        : null;
+      pref.city = (pref.city as any)?.id
+        ? ((citiesMap.find((c) => c.id === (pref.city as any).id) ||
+            null) as City)
+        : null;
+      return pref;
+    });
+    return hydratedPreferences;
   }
 }

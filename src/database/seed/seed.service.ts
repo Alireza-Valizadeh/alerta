@@ -80,6 +80,8 @@ export class SeedService implements OnModuleInit {
       ).map((value) => ({ title: value }));
       await this.bodyStateRepository.save(bodyStatesToSeed);
     }
+    const allBodyStates = await this.bodyStateRepository.find();
+    this.cacheLookupMap('bodyStates', allBodyStates);
   }
 
   async seedGearboxes() {
@@ -91,6 +93,8 @@ export class SeedService implements OnModuleInit {
       ).map((value) => ({ title: value }));
       await this.gearboxRepository.save(gearboxesToSeed);
     }
+    const allGearboxes = await this.gearboxRepository.find();
+    this.cacheLookupMap('gearboxes', allGearboxes);
   }
 
   async seedColors() {
@@ -115,6 +119,8 @@ export class SeedService implements OnModuleInit {
       ).map((value) => ({ title: value }));
       await this.fuelTypeRepository.save(fuelTypesToSeed);
     }
+    const allFuelTypes = await this.fuelTypeRepository.find();
+    this.cacheLookupMap('fuelTypes', allFuelTypes);
   }
 
   async seedEngineStates() {
@@ -126,6 +132,8 @@ export class SeedService implements OnModuleInit {
       ).map((value) => ({ title: value }));
       await this.engineStateRepository.save(engineStatesToSeed);
     }
+    const allEngineStates = await this.engineStateRepository.find();
+    this.cacheLookupMap('engineStates', allEngineStates);
   }
 
   async seedChassisStates() {
@@ -137,6 +145,8 @@ export class SeedService implements OnModuleInit {
       ).map((value) => ({ title: value }));
       await this.chassisStateRepository.save(chassisStatesToSeed);
     }
+    const allChassisStates = await this.chassisStateRepository.find();
+    this.cacheLookupMap('chassisStates', allChassisStates);
   }
 
   async seedStatesAndCities() {
@@ -163,6 +173,10 @@ export class SeedService implements OnModuleInit {
       });
       await this.cityRepository.save(citiesToSeed);
     }
+    const allStates = await this.stateRepository.find();
+    this.cacheLookupMap('states', allStates);
+    const allCities = await this.cityRepository.find();
+    this.cacheLookupMap('cities', allCities);
   }
   async seedMakesAndModels() {
     const existingMakes = await this.makeRepository.count();
@@ -185,6 +199,10 @@ export class SeedService implements OnModuleInit {
       });
       await this.modelRepository.save(modelsToSeed);
     }
+    const allMakes = await this.makeRepository.find();
+    this.cacheLookupMap('makes', allMakes);
+    const allModels = await this.modelRepository.find();
+    this.cacheLookupMap('models', allModels);
   }
 
   private async cacheLookupMap(
