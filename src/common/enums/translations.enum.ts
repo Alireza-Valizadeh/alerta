@@ -1,6 +1,6 @@
 export enum PersianGeneralStatements {
   Undefined = 'تعیین‌نشده',
-  NewSmsCost = 'ارسال پیامک برای آگهی جدید',
+  NewSmsCost = 'ارسال آگهی جدید',
   SignUpBonus = 'اعتبار هدیه ثبت نام',
 }
 
