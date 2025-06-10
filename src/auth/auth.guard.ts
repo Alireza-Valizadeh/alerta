@@ -29,7 +29,7 @@ export class AuthGuard implements CanActivate {
       request['user'] = payload;
       return true;
     } catch (error) {
-      this.logger.error('Suspicious activity detected.', error);
+      this.logger.log('invalid token error', error);
       throw new ForbiddenException();
     }
   }

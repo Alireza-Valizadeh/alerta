@@ -137,7 +137,12 @@ export class ListingsService {
         const savedListing = await this.addListing(rawListing);
         listings.push(savedListing);
       } catch (error) {
-        this.logger.error('Error adding listing from divar', info, error);
+        this.logger.error(
+          error?.message,
+          error?.stack,
+          'ListingsService.addListingFromDivar',
+          info,
+        );
         continue;
       }
     }
@@ -314,7 +319,12 @@ export class ListingsService {
       const mileage = parseInt(englishNumerals, 10);
       return isNaN(mileage) ? null : mileage;
     } catch (error) {
-      this.logger.error('Error parsing mileage', error);
+      this.logger.error(
+        error?.message,
+        error?.stack,
+        'ListingsService.parseMileageToNumber',
+        { mileageString },
+      );
       return null;
     }
   }
@@ -329,7 +339,12 @@ export class ListingsService {
       const price = parseInt(englishNumerals, 10);
       return isNaN(price) ? null : price;
     } catch (error) {
-      this.logger.error('Error parsing price', error);
+      this.logger.error(
+        error?.message,
+        error?.stack,
+        'ListingsService.parsePriceToNumber',
+        { priceString },
+      );
       return null;
     }
   }
@@ -345,7 +360,12 @@ export class ListingsService {
       const insurance = parseInt(englishNumerals, 10);
       return isNaN(insurance) ? null : insurance;
     } catch (error) {
-      this.logger.error('Error parsing insurance', error);
+      this.logger.error(
+        error?.message,
+        error?.stack,
+        'ListingsService.parseInsuranceToNumber',
+        { insuranceString },
+      );
       return null;
     }
   }
@@ -355,7 +375,12 @@ export class ListingsService {
       const year = parseInt(englishNumerals, 10);
       return isNaN(year) ? null : year;
     } catch (error) {
-      this.logger.error('Error parsing year', error);
+      this.logger.error(
+        error?.message,
+        error?.stack,
+        'ListingsService.parseYearToNumber',
+        { yearString },
+      );
       return null;
     }
   }

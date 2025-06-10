@@ -1,10 +1,12 @@
 import { Injectable, LoggerService } from '@nestjs/common';
-import { createLogger, format, transports } from 'winston';
+import { createLogger, format, Logger, transports } from 'winston';
 import * as path from 'path';
 import { inspect } from 'util';
+import { LogErrorRepositoryService } from './log-error-repository.service';
+import { DatabaseLoggerTransport } from './transports/database-logger.transport';
 @Injectable()
 export class MyLoggerService implements LoggerService {
-  private readonly logger = createLogger({
+  private logger: Logger = createLogger({
     format: format.combine(
       format.timestamp({ format: 'YYYY-MM-DD HH:mm:ss' }),
       format.printf(({ timestamp, level, message, context }) => {
@@ -12,8 +14,8 @@ export class MyLoggerService implements LoggerService {
       }),
     ),
     transports: [
-      new transports.File({
-        filename: path.join('logs', 'errors.log.txt'),
+      new DatabaseLoggerTransport({
+        logErrorRepositoryService: this.logErrorRepositoryService,
         level: 'error',
       }),
       new transports.File({
@@ -30,6 +32,10 @@ export class MyLoggerService implements LoggerService {
     ],
   });
 
+  constructor(
+    private readonly logErrorRepositoryService: LogErrorRepositoryService,
+  ) {}
+
   private formatArgs(args: any[]): string {
     return args
       .map((arg) =>
@@ -43,8 +49,8 @@ export class MyLoggerService implements LoggerService {
   warn(message: any, ...optionalParams: any[]) {
     this.logger.warn(this.formatArgs([message, ...optionalParams]));
   }
-  error(message: any, ...optionalParams: any[]) {
-    this.logger.error(this.formatArgs([message, ...optionalParams]));
+  error(message: string, trace?: string, context?: string, meta?: object) {
+    this.logger.error(message, { context, trace, meta });
   }
   http(message: any, ...optionalParams: any[]) {
     this.logger.http(this.formatArgs([message, ...optionalParams]));

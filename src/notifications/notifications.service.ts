@@ -65,7 +65,12 @@ export class NotificationsService {
       }
       this.logger.log('sent Vertification Code', phone, code);
     } catch (error) {
-      this.logger.error('sendSandboxSms error', error);
+      this.logger.error(
+        error?.message,
+        error?.stack,
+        'NotificationsService.sendSandboxSms',
+        { phone, code },
+      );
     }
   }
 
@@ -78,7 +83,12 @@ export class NotificationsService {
       });
       return notifications;
     } catch (error) {
-      this.logger.error('findUserNotifications error', error);
+      this.logger.error(
+        error?.message,
+        error?.stack,
+        'NotificationsService.findUserNotifications',
+        { uid },
+      );
       return [];
     }
   }
@@ -101,7 +111,12 @@ export class NotificationsService {
       const notif = this.notificationRepository.create(notification);
       return this.notificationRepository.save(notif);
     } catch (error) {
-      this.logger.error('saveNotification error', error);
+      this.logger.error(
+        error?.message,
+        error?.stack,
+        'NotificationsService.saveNotification',
+        { preference },
+      );
       return null;
     }
   }
@@ -132,7 +147,15 @@ export class NotificationsService {
       const data = response.data as any;
       return data?.data.cost;
     } catch (error) {
-      this.logger.error('sendBulkSms error', error);
+      this.logger.error(
+        error?.message,
+        error?.stack,
+        'NotificationsService.sendSms',
+        {
+          phones,
+          text,
+        },
+      );
       return null;
     }
   }
