@@ -31,6 +31,8 @@ import { CreditsModule } from './credits/credits.module';
         password: configService.get('DB_PASSWORD'),
         database: configService.get('DB_DATABASE'),
         autoLoadEntities: true,
+        migrationsRun: true,
+        migrations: ['src/database/migrations/*.ts'],
         // synchronize: configService.get('NODE_ENV') !== 'production',
         synchronize: true,
         logging: false,
