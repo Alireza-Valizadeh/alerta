@@ -14,6 +14,7 @@ import { DatabaseModule } from './database/database.module';
 import { RedisService } from './core/redis.service';
 import { CoreModule } from './core/core.module';
 import { CreditsModule } from './credits/credits.module';
+import { TemplatesModule } from './templates/templates.module';
 
 @Module({
   imports: [
@@ -48,6 +49,7 @@ import { CreditsModule } from './credits/credits.module';
     DatabaseModule,
     CoreModule,
     CreditsModule,
+    TemplatesModule,
   ],
   controllers: [AppController],
   providers: [AppService, RedisService],
